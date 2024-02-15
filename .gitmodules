@@ -4,3 +4,6 @@
 [submodule "class_resources/docs"]
 	path = class_resources/docs
 	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/iaed24.git
+[submodule "class_resources/submissions"]
+	path = class_resources/submissions
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/labs/ist1110262.git
