@@ -1,0 +1,3 @@
+[submodule "class_resources/ist1110262"]
+	path = class_resources/ist1110262
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/labs/ist1110262.git
