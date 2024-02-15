@@ -1,3 +1,6 @@
-[submodule "class_resources/ist1110262"]
-	path = class_resources/ist1110262
-	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/labs/ist1110262.git
+[submodule "class_resources/feedback"]
+	path = class_resources/feedback
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/feedback/labs/ist1110262.git
+[submodule "class_resources/docs"]
+	path = class_resources/docs
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/iaed24.git
