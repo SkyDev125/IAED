@@ -1,9 +1,1 @@
-*
-!.gitignore 
-!.gitlab-ci.yml
-!lab*/
-!lab*/ex*/
-!**.md
-!**.c
-!**.h
-
+*.out
