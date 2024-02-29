@@ -40,19 +40,14 @@
 		}
 	},
 
-	"workspaceFolder": "/workspaces/IAED"
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"workspaceFolder": "/workspaces/IAED",
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	"postCreateCommand": {
+		"update_apt": "sudo apt-get update"
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	},
 
-	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"postStartCommand": {
+		"install_clang_formatter": "apt-get install -y clang-format"
+	}
 }
