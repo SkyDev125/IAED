@@ -48,6 +48,7 @@
 	},
 
 	"postStartCommand": {
-		"install_clang_formatter": "apt-get install -y clang-format"
+		"install_clang_formatter": "apt-get install -y clang-format",
+		"install_gdb_debugger": "apt-get install -y gdb"
 	}
 }
