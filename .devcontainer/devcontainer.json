@@ -39,16 +39,13 @@
 			]
 		}
 	},
-
 	"workspaceFolder": "/workspaces/IAED",
-
 	"postCreateCommand": {
 		"update_apt": "sudo apt-get update"
-
 	},
-
 	"postStartCommand": {
 		"install_clang_formatter": "apt-get install -y clang-format",
-		"install_gdb_debugger": "apt-get install -y gdb"
+		"install_gdb": "apt-get install -y gdb",
+		"install_valgrind": "apt-get install -y valgrind"
 	}
 }
