@@ -104,7 +104,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/analysis/${fileBasenameNoExtension}.debug"
             ],
             "options": {
                 "cwd": "${fileDirname}"
