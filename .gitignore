@@ -1,2 +1,3 @@
 *.out
 valgrind-out.txt
+analysis/
