@@ -1,28 +1,36 @@
 {
     "tasks": [
-        // Make folder
+        // make folder
         {
-            "label": "create-analysis-dir",
-            "type": "shell",
+            "label": "create_dir",
             "command": "mkdir",
             "args": [
                 "-p",
                 "${fileDirname}/analysis"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
             "group": "build",
             "detail": "0th step in build task.",
-            "presentation": {
-                "echo": false,
-                "showReuseMessage": false,
-            }
+        },
+        // cpp check
+        {
+            "label": "cpp_check",
+            "command": "cppcheck",
+            "args": [
+                "--enable=all", // Enable all checks
+                "--inconclusive", // Report inconclusive results
+                "--force", // Check all configurations
+                "--check-config",
+                "--suppress=missingIncludeSystem", // Suppress missing system include warnings
+                "--output-file=${fileDirname}/analysis/cpp_check.txt", // Output file
+                "${file}" // Analyze the current file
+            ],
+            "group": "build",
+            "detail": "1st step in build task.",
         },
         // gcc
         {
             "label": "gcc",
-            "command": "/usr/bin/gcc",
+            "command": "gcc",
             "args": [
                 "-Wall",
                 "-Wextra",
@@ -35,24 +43,15 @@
                 "-o",
                 "${fileDirname}/analysis/${fileBasenameNoExtension}.out"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
             "problemMatcher": [
                 "$gcc"
             ],
             "group": "build",
-            "dependsOn": "create-analysis-dir",
-            "detail": "1st step in build task.",
-            "presentation": {
-                "echo": false,
-                "showReuseMessage": false,
-            }
+            "detail": "2nd step in build task."
         },
         // lizard
         {
             "label": "lizard",
-            "type": "shell",
             "command": "lizard",
             "args": [
                 "-Eduplicate", // Code duplication check
@@ -62,43 +61,48 @@
                 "-o",
                 "${fileDirname}/analysis/${fileBasenameNoExtension}.html"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "dependsOn": "gcc",
             "group": "build",
-            "detail": "2nd step in build task.",
-            "presentation": {
-                "echo": false,
-                "showReuseMessage": false,
-            }
+            "detail": "3rd step in build task."
         },
         // valgrind
         {
             "label": "valgrind",
-            "type": "shell",
             "command": "valgrind",
             "args": [
                 "--leak-check=full",
                 "--show-leak-kinds=all",
                 "--track-origins=yes",
-                "--verbose",
                 "--log-file=${fileDirname}/analysis/valgrind-out.txt",
                 "${fileDirname}/analysis/${fileBasenameNoExtension}.out"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "dependsOn": "lizard",
-            "detail": "3rd step in build task.",
+            "detail": "4th step in build task.",
+            "group": "build",
+        },
+        // Build Controller
+        {
+            "label": "build",
+            "dependsOn": [
+                "create_dir",
+                "cpp_check",
+                "gcc",
+                "lizard",
+                "valgrind"
+            ],
+            "dependsOrder": "sequence",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "presentation": {
-                "close": true,
             }
         }
     ],
+    // Default settings
+    "presentation": {
+        "showReuseMessage": false,
+        "panel": "shared"
+    },
+    "options": {
+        "cwd": "${fileDirname}"
+    },
+    "type": "shell",
     "version": "2.0.0"
 }
