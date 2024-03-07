@@ -56,6 +56,10 @@
             "args": [
                 "-Eduplicate", // Code duplication check
                 "-w", // Enable warnings
+                "-L 50",
+                "-T nloc=30",
+                "-C 12",
+                "-m",
                 "${file}",
                 "-H", // Generate HTML report
                 "-o",
