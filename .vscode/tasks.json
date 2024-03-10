@@ -39,7 +39,7 @@
                 "-fdiagnostics-color=always",
                 "-lm", // include math
                 "-g", // help for debugger
-                "${file}",
+                "*.c",
                 "-o",
                 "${fileDirname}/analysis/${fileBasenameNoExtension}.out"
             ],
@@ -106,7 +106,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "*.c",
                 "-o",
                 "${fileDirname}/analysis/${fileBasenameNoExtension}.debug"
             ],
