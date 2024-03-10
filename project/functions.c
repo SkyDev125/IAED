@@ -29,38 +29,43 @@ int menu() {
 	while (true) {
 		// Error checking for command
 		error_code = get_command(&command);
-		if (error_code != 0) {
+		if (error_code != SUCCESSFUL) {
 			free_all(args);
 			return error_code;
 		}
 
-		switch (command) {
-		case 'q':
-			if (args_num != 0) {
-				free_all(args);
-			}
-			return SUCCESS;
-		case 'p':
-			run_p(args, &args_num);
-			break;
-		case 'e':
-			break;
-		case 's':
-			break;
-		case 'v':
-			break;
-		case 'f':
-			break;
-		case 'r':
-			break;
-		default:
-			free_all(args);
-			return 2;
+		if (run_command(&command, args, &args_num) == SUCCESSFUL_EXIT) {
+			return SUCCESSFUL;
 		}
 	}
 
 	free_all(args);
 	return UNEXPECTED;
+}
+
+int run_command(char *command, void **args, int *args_num) {
+	switch (*command) {
+	case 'q':
+		free_all(args);
+		return SUCCESSFUL_EXIT;
+	case 'p':
+		run_p(args, args_num);
+		break;
+	case 'e':
+		break;
+	case 's':
+		break;
+	case 'v':
+		break;
+	case 'f':
+		break;
+	case 'r':
+		break;
+	default:
+		free_all(args);
+		return UNEXPECTED_INPUT;
+	}
+	return SUCCESSFUL;
 }
 
 bool is_command(int *command) {
@@ -94,7 +99,7 @@ int get_command(char *command) {
 		while ((c = get_buff_char()) != '\0') {
 			if (is_command(&c)) {
 				*command = c;
-				return 0;
+				return SUCCESSFUL;
 			}
 		}
 		buff_index = 0;
@@ -104,7 +109,7 @@ int get_command(char *command) {
 	while ((c = getchar()) != EOF) {
 		if (is_command(&c)) {
 			*command = c;
-			return 0;
+			return SUCCESSFUL;
 		}
 	}
 
@@ -138,7 +143,7 @@ int parse_int(int *arg) {
 		}
 	}
 
-	return SUCCESS;
+	return SUCCESSFUL;
 }
 
 int parse_float(float *arg) {
@@ -178,7 +183,7 @@ int parse_float(float *arg) {
 		}
 	}
 
-	return SUCCESS;
+	return SUCCESSFUL;
 }
 
 int parse_string(char **arg) {
@@ -191,7 +196,7 @@ int parse_string(char **arg) {
 
 	if (current == '\"') {
 		parse_quoted_string(arg);
-		return SUCCESS;
+		return SUCCESSFUL;
 	} else if (is_command(&current) && isspace((next = getchar()))) {
 		// Return if command was found
 		buff_index = 0;
@@ -200,7 +205,7 @@ int parse_string(char **arg) {
 		return UNEXPECTED_INPUT;
 	} else if (isspace((next = getchar()))) {
 		(*arg)[0] = current;
-		return SUCCESS;
+		return SUCCESSFUL;
 	}
 
 	(*arg)[0] = current;
@@ -232,7 +237,7 @@ int parse_string(char **arg) {
 	shrink_string_cap(arg, &string_size);
 	(*arg)[string_size] = '\0';
 
-	return SUCCESS;
+	return SUCCESSFUL;
 }
 
 int parse_quoted_string(char **arg) {
@@ -251,7 +256,7 @@ int parse_quoted_string(char **arg) {
 	shrink_string_cap(arg, &string_size);
 	(*arg)[string_size] = '\0';
 
-	return SUCCESS;
+	return SUCCESSFUL;
 }
 
 void free_all(void **args) {
@@ -272,7 +277,7 @@ int grow_string_cap(char **string, size_t *string_size) {
 			*string = temp;
 		}
 	}
-	return 0;
+	return SUCCESSFUL;
 };
 
 int shrink_string_cap(char **string, size_t *string_size) {
@@ -282,7 +287,7 @@ int shrink_string_cap(char **string, size_t *string_size) {
 	} else {
 		*string = temp;
 	}
-	return 0;
+	return SUCCESSFUL;
 };
 
 int run_p(void **args, int *args_num) {
@@ -292,7 +297,7 @@ int run_p(void **args, int *args_num) {
 	if (error_code == UNEXPECTED_INPUT) {
 		*args_num = 0;
 		printf("show parks\n");
-		return 0;
+		return SUCCESSFUL;
 	} else if (error_code == UNEXPECTED) {
 		return UNEXPECTED;
 	}
@@ -313,5 +318,5 @@ int run_p(void **args, int *args_num) {
 	printf("%.2f\n", *(float *)args[3]);
 	printf("%.2f\n", *(float *)args[4]);
 
-	return 0;
+	return SUCCESSFUL;
 }

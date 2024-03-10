@@ -33,6 +33,7 @@ void show_parks();
 int grow_string_cap(char **string, size_t *string_size);
 int shrink_string_cap(char **string, size_t *string_size);
 
+int run_command(char *command, void **args, int *args_num);
 int run_p(void **args, int *args_num);
 int run_e();
 int run_s();

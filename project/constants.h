@@ -14,9 +14,11 @@
 #define STRING_CHUNKS 30
 #define MAX_PARKS 20
 
-#define SUCCESS 0
-#define UNEXPECTED 1
-#define UNEXPECTED_INPUT 2
+#define SUCCESSFUL 0
+#define SUCCESSFUL_EXIT 1
+#define UNEXPECTED 2
+#define UNEXPECTED_INPUT 3
+
 
 const char VALID_COMMANDS[] = "qpesvfr";
 
