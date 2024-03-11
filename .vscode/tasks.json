@@ -22,7 +22,7 @@
                 "--check-config",
                 "--suppress=missingIncludeSystem", // Suppress missing system include warnings
                 "--output-file=${fileDirname}/analysis/cpp_check.txt", // Output file
-                "${file}" // Analyze the current file
+                "${fileDirname}",
             ],
             "group": "build",
             "detail": "1st step in build task.",
@@ -41,7 +41,7 @@
                 "-g", // help for debugger
                 "*.c",
                 "-o",
-                "${fileDirname}/analysis/${fileBasenameNoExtension}.out"
+                "${fileDirname}/analysis/gcc.out"
             ],
             "problemMatcher": [
                 "$gcc"
@@ -60,10 +60,10 @@
                 "-T nloc=30",
                 "-C 12",
                 "-m",
-                "${file}",
+                "${fileDirname}",
                 "-H", // Generate HTML report
                 "-o",
-                "${fileDirname}/analysis/${fileBasenameNoExtension}.html"
+                "${fileDirname}/analysis/lizard.html"
             ],
             "group": "build",
             "detail": "3rd step in build task."
@@ -77,7 +77,7 @@
                 "--show-leak-kinds=all",
                 "--track-origins=yes",
                 "--log-file=${fileDirname}/analysis/valgrind-out.txt",
-                "${fileDirname}/analysis/${fileBasenameNoExtension}.out"
+                "${fileDirname}/analysis/gcc.out"
             ],
             "detail": "4th step in build task.",
             "group": "build",

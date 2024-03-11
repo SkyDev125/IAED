@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Diogo Santos (ist1110262)
- * @brief
+ * @brief Main entry point for the application
  * @version 0.1
  * @date 09-03-2024
  *
@@ -9,12 +9,14 @@
  *
  */
 
-#include "functions.h"
+#include "headers.h"
 
 /**
- * @brief  Main Function
+ * @brief  Main function that starts the application
  *
- * @return int Return 0 if the program executes successfully, 1 if there is a
- * general error, and 2 if the inputs are incorrect.
+ * @return SUCCESSFUL if the program executes without errors,
+ * UNEXPECTED if an unexpected error occurs, and UNEXPECTED_INPUT if the program
+ * receives an input that it doesn't know how to handle.
+ *
  */
 int main() { return menu(); }

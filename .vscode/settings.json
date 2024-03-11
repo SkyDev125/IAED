@@ -1,10 +1,5 @@
 {
     "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
         "clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling"
-    ],
-    "files.associations": {
-        "constants.h": "c",
-        "stdio.h": "c",
-        "headers.h": "c"
-    }
+    ]
 }
