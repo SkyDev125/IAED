@@ -39,6 +39,8 @@ int run_p(void **args) {
 		return UNEXPECTED;
 	}
 
+	// TODO: CHECK IF PARK ALREADY EXISTS BY NAME
+
 	if (parse_p_values(args) == SUCCESSFUL_EXIT) return SUCCESSFUL;
 
 	add_park(
@@ -82,8 +84,6 @@ int parse_p_values(void **args) {
 		free(args[4]);
 		return SUCCESSFUL_EXIT;
 	}
-
-	// TODO: CHECK IF PARK ALREADY EXISTS BY NAME
 
 	return SUCCESSFUL;
 }

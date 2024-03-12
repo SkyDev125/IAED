@@ -82,9 +82,7 @@ void add_park(
  */
 void remove_park(park *parking) {
 	// If the park is NULL, there's nothing to remove
-	if (parking == NULL) {
-		return;
-	}
+	if (parking == NULL) return;
 
 	// If the park isnt the first update next
 	if (parking->previous != NULL) {

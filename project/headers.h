@@ -17,11 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "constants.h"
-#include "mem_manage.h"
-#include "linked_list.h"
 #include "commands.h"
-#include "parsing.h"
+#include "constants.h"
+#include "linked_list.h"
+#include "mem_manage.h"
 #include "menu.h"
+#include "parsing.h"
 
 #endif
