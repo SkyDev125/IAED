@@ -35,6 +35,7 @@
                 "-Wall",
                 "-Wextra",
                 "-Werror",
+                "-ansi",
                 "-Wno-unused-result",
                 "-fdiagnostics-color=always",
                 "-lm", // include math
@@ -104,11 +105,17 @@
             "label": "C/C++: gcc build active file",
             "command": "/usr/bin/gcc",
             "args": [
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-ansi",
+                "-Wno-unused-result",
                 "-fdiagnostics-color=always",
-                "-g",
+                "-lm", // include math
+                "-g", // help for debugger
                 "*.c",
                 "-o",
-                "${fileDirname}/analysis/${fileBasenameNoExtension}.debug"
+                "${fileDirname}/analysis/gcc.debug"
             ],
             "options": {
                 "cwd": "${fileDirname}"

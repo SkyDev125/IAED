@@ -17,9 +17,10 @@
 
 /// Buffer size for reading input from the command line
 #define MAX_BUFF 3
+#define MAX_LINE_BUFF 8193
 
 /// Size of chunk to allocate for a string when reading from the buffer
-#define STRING_CHUNKS 30
+#define STRING_CHUNKS 100
 
 /// @}
 
