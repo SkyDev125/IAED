@@ -7,3 +7,9 @@
 [submodule "class_resources/submissions"]
 	path = class_resources/submissions
 	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/labs/ist1110262.git
+[submodule "project/submissions"]
+	path = project/submissions
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/project/ist1110262.git
+[submodule "project/feedback"]
+	path = project/feedback
+	url = git@gitlab.rnl.tecnico.ulisboa.pt:iaed24/feedback/project/ist1110262.git
