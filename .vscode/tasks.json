@@ -35,7 +35,6 @@
                 "-Wall",
                 "-Wextra",
                 "-Werror",
-                "-ansi",
                 "-Wno-unused-result",
                 "-fdiagnostics-color=always",
                 "-lm", // include math
@@ -108,7 +107,6 @@
                 "-Wall",
                 "-Wextra",
                 "-Werror",
-                "-ansi",
                 "-Wno-unused-result",
                 "-fdiagnostics-color=always",
                 "-lm", // include math
