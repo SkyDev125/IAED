@@ -12,7 +12,8 @@
 #ifndef LINKED_LIST
 #define LINKED_LIST
 
-// Forward declaration of vehicle
+// Forward declarations
+typedef struct park_struct park;
 typedef struct vehicle_struct vehicle;
 
 /// Structure to represent a date.
@@ -21,14 +22,45 @@ typedef struct {
 	int years, months, days, hours, minutes;
 } date;
 
+/// @defgroup registry_types Registration of entries and exit types.
+/// @{
+
+typedef struct {
+	vehicle *vehicle_ptr;
+	park **park_ptr;
+	date timestamp;
+} registry_enter;
+
+typedef struct {
+	vehicle *vehicle_ptr;
+	park **park_ptr;
+	date timestamp;
+	float cost;
+} registry_exit;
+
+typedef union {
+	registry_enter enter;
+	registry_exit exit;
+} registry_union;
+
+typedef struct registration {
+	registry_union registration;
+	char type;
+	struct registration *next;
+} registry;
+
+/// @}
+
+/// @defgroup park_vehicle_types Parks and Vehicle types
+/// @{
+
 /// Structure to represent a parking lot.
 typedef struct park_struct {
 	char *name;
 	unsigned long hashed_name;
 	int capacity, free_spaces;
 	float first_hour_value, value, day_value;
-	vehicle *history_vehicles;
-	date *history_dates;
+	registry registries;
 	struct park_struct *next;
 	struct park_struct *previous;
 } park;
@@ -41,12 +73,10 @@ typedef struct {
 
 /// Structure to represent a vehicle.
 typedef struct vehicle_struct {
-	char *license_plate;
+	char license_plate[LICENSE_PLATE_SIZE + 1];
 	unsigned long hashed_plate;
-	park ***history_parks; // array of pointers that points to parks
-	date *history_dates;
+	registry registries;
 	struct vehicle_struct *next;
-	struct vehicle_struct *previous;
 } vehicle;
 
 /// Structure to represent an index of vehicles.
@@ -54,6 +84,8 @@ typedef struct {
 	vehicle *first, *last;
 	int vehicle_num;
 } vehicle_index;
+
+/// @}
 
 /// @defgroup park_operations Parking Lot Operations
 /// @{
@@ -70,8 +102,6 @@ void remove_park(park *parking, park_index *parks);
 /// Returns the total number of parking lots in the list.
 void show_parks(park_index *parks);
 
-bool exists_park(char *name, unsigned long name_hash, park_index *parks);
-
 park *find_park(char *name, unsigned long park_hash, park_index *parks);
 
 /// @}
@@ -79,6 +109,32 @@ park *find_park(char *name, unsigned long park_hash, park_index *parks);
 /// Hashes a string.
 unsigned long hash(char *str);
 
-void remove_vehicle(vehicle *vehicle_del, vehicle_index *vehicles);
+registry *get_last_registry(registry *reg);
+
+/// @defgroup vehicle_operations Vehicle operations
+/// @{
+
+vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles);
+
+void remove_vehicle(vehicle_index *vehicles);
+
+vehicle *find_vehicle(
+	char *license_plate, unsigned long license_plate_hash,
+	vehicle_index *vehicles
+);
+
+void register_entrance(
+	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	date *timestamp
+);
+
+void register_exit(
+	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	date *timestamp, float *cost
+);
+
+void add_entry(registry *reg, registry_union *entry, char type);
+
+/// @}
 
 #endif

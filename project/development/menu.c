@@ -32,7 +32,7 @@ int menu() {
 		if (run_command(command, &parks, &vehicles) == SUCCESSFUL_EXIT) break;
 	}
 
-	free_all(&parks);
+	free_all(&parks, &vehicles);
 	return SUCCESSFUL;
 }
 
@@ -52,18 +52,18 @@ int run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 	args = remove_whitespaces(++args);
 
 	switch (*command) {
-	case EXIT:
+	case COMMAND_EXIT:
 		return SUCCESSFUL_EXIT;
 	case CREATE_OR_VIEW:
 		return run_p(args, parks);
 	case ADD_VEHICLE:
 		return run_e(args, parks, vehicles);
-	case REMOVE_VEHICLE:
-		return run_s(args, parks, vehicles);
-	case VIEW_VEHICLE:
-		return run_v(args, parks, vehicles);
-	case PARK_BILLING:
-		return run_f(args, parks, vehicles);
+	// case REMOVE_VEHICLE:
+	// 	return run_s(args, parks, vehicles);
+	// case VIEW_VEHICLE:
+	// 	return run_v(args, parks, vehicles);
+	// case PARK_BILLING:
+	// 	return run_f(args, parks, vehicles);
 	case REMOVE_PARK:
 		return run_r(args, parks);
 	default:

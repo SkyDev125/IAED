@@ -58,6 +58,6 @@ void free_all(park_index *parks, vehicle_index *vehicles) {
 		remove_park(parks->first, parks);
 	}
 	for (i = 0; i < vehicle_num; i++) {
-		remove_vehicle(vehicles->first, vehicles);
+		remove_vehicle(vehicles);
 	}
 }

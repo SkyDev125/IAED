@@ -11,6 +11,9 @@
 
 #include "headers.h"
 
+const int days_in_month[] = {JAN, FEB, MAR, APR, MAY, JUN,
+							 JUL, AUG, SEP, OCT, NOV, DEC};
+
 char *remove_whitespaces(char *str) {
 	char *current = str;
 	while ((int)*current != '\0') {
@@ -43,6 +46,31 @@ char *parse_string(char *str_start, char **str_end, int *size) {
 	return str;
 }
 
+char *parse_license_plate(char *str, char *license_plate) {
+	str = remove_whitespaces(str);
+	strncpy(license_plate, str, LICENSE_PLATE_SIZE);
+	license_plate[LICENSE_PLATE_SIZE] = '\0';
+
+	return str + LICENSE_PLATE_SIZE;
+}
+
+char *parse_date(char *str, date *timestamp) {
+	str = remove_whitespaces(str);
+	sscanf(
+		str, "%2d-%2d-%4d", &(timestamp->days), &(timestamp->months),
+		&(timestamp->years)
+	);
+
+	return str + DATE_MAX_SIZE;
+}
+
+char *parse_time(char *str, date *timestamp) {
+	str = remove_whitespaces(str);
+	sscanf(str, "%2d:%2d", &(timestamp->hours), &(timestamp->minutes));
+
+	return str + HOUR_MAX_SIZE;
+}
+
 int str_size(char **args) {
 	char *end_args;
 	if ((*args)[0] != '"')
@@ -56,8 +84,8 @@ int str_size(char **args) {
 bool is_licence_plate(char *str) {
 	bool number_pair = FALSE, letter_pair = FALSE;
 
-	while (str < str + LICENCE_PLATE_SIZE) {
-		if (*(str + 2) != '-' && str + 2 < str + LICENCE_PLATE_SIZE)
+	while (str < str + LICENSE_PLATE_SIZE) {
+		if (*(str + 2) != '-' && str + 2 < str + LICENSE_PLATE_SIZE)
 			return FALSE;
 
 		if (isalpha(*str) && isalpha(*(str + 1))) {
@@ -71,4 +99,20 @@ bool is_licence_plate(char *str) {
 	}
 
 	return number_pair && letter_pair;
+}
+
+long int date_to_minutes(date *d) {
+	long int minutes;
+
+	minutes = d->years * DAYS_IN_YEAR * MINS_PER_DAY;
+
+	for (int i = 0; i < d->months - 1; i++) {
+		minutes += days_in_month[i] * MINS_PER_DAY;
+	}
+
+	minutes += (d->days - 1) * MINS_PER_DAY;
+	minutes += d->hours * 60;
+	minutes += d->minutes;
+
+	return minutes;
 }

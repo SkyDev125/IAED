@@ -23,6 +23,33 @@
 
 /// @}
 
+/// @defgroup date_constants Date related constants
+/// @{
+
+/// Days per month
+enum months {
+	JAN = 31,
+	FEB = 28,
+	MAR = 31,
+	APR = 30,
+	MAY = 31,
+	JUN = 30,
+	JUL = 31,
+	AUG = 31,
+	SEP = 30,
+	OCT = 31,
+	NOV = 30,
+	DEC = 31,
+};
+
+/// Total days in a year
+#define DAYS_IN_YEAR 365
+
+/// Total minutes in a day
+#define MINS_PER_DAY 24 * 60
+
+/// @}
+
 /// @defgroup command_constants Command related constants
 /// @{
 
@@ -32,7 +59,7 @@
 
 /// Valid commands
 enum commands {
-	EXIT = 'q',
+	COMMAND_EXIT = 'q',
 	CREATE_OR_VIEW = 'p',
 	ADD_VEHICLE = 'e',
 	REMOVE_VEHICLE = 's',
@@ -46,10 +73,16 @@ enum commands {
 /// @defgroup park_constants Park related constants
 /// @{
 
-/// Maximum number of parks that can be created
+/// Maximum number of parks
 #define MAX_PARKS 20
-#define LICENCE_PLATE_SIZE 8
+
+/// Maximum size of License plates
+#define LICENSE_PLATE_SIZE 8
+
+/// Maximum size of date
 #define DATE_MAX_SIZE 10
+
+/// Maximum size of hour
 #define HOUR_MAX_SIZE 5
 
 /// @}
@@ -82,6 +115,20 @@ enum commands {
 
 /// Alias for boolean
 typedef char bool;
+
+/// @}
+
+/// @defgroup Registry related constants
+/// @{
+
+// Entry identifier
+#define ENTER 1
+
+// Exit identifier
+#define EXIT 0
+
+// State to define that registry isnt initialized
+#define UNDEFINED 2
 
 /// @}
 

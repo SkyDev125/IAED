@@ -31,11 +31,19 @@ char *delimit(char *str, char delimiter);
 /// Parses a string from the given input
 char *parse_string(char *str_start, char **str_end, int *size);
 
+char *parse_license_plate(char *str, char *license_plate);
+
+char *parse_date(char *str, date *timestamp);
+
+char *parse_time(char *str, date *timestamp);
+
 /// Finds the size of a string through its pointers
 int str_size(char **args);
 
 /// Validates a licence plate
 bool is_licence_plate(char *str);
+
+long int date_to_minutes(date *d);
 
 /// @}
 

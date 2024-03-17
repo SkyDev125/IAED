@@ -25,8 +25,13 @@ int run_p(char *args, park_index *parks);
 /// of a vehicle
 int run_e(char *args, park_index *parks, vehicle_index *vehicles);
 
-/// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the exit
-/// of a vehicle
+void run_e_errochecking(
+	park *parking, char *name, char *err, char *license_plate,
+	vehicle_index *vehicles, date *timestamp
+);
+
+/// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
+/// exit of a vehicle
 int run_s(char *args, park_index *parks, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
