@@ -48,6 +48,9 @@ enum commands {
 
 /// Maximum number of parks that can be created
 #define MAX_PARKS 20
+#define LICENCE_PLATE_SIZE 8
+#define DATE_MAX_SIZE 10
+#define HOUR_MAX_SIZE 5
 
 /// @}
 

@@ -21,28 +21,25 @@
 /// parking lot or lists existing ones
 int run_p(char *args, park_index *parks);
 
-/// Function to get the remaining values of the COMMAND_CREATE_OR_VIEW Command
-int parse_p_values(void **args);
-
 /// Function to run the COMMAND_ADD_VEHICLE command, which registers the entry
 /// of a vehicle
-int run_e();
+int run_e(char *args, park_index *parks, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the exit
 /// of a vehicle
-int run_s();
+int run_s(char *args, park_index *parks, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information
-int run_v();
+int run_v(char *args, park_index *parks, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing of
 /// a parking lot
-int run_f();
+int run_f(char *args, park_index *parks, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_REMOVE_PARK command, which removes a parking lot
 /// from the system
-int run_r();
+int run_r(char *args, park_index *parks);
 
 /// @}
 

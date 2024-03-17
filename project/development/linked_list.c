@@ -42,7 +42,7 @@ void add_park(
 	float *day_value, park_index *parks
 ) {
 	// Allocate memory for new park and initialize its fields
-	park *new_park = (park *)malloc(sizeof(park));
+	park *new_park = malloc(sizeof(park));
 
 	new_park->name = name;
 	new_park->hashed_name = hash(name);
@@ -117,13 +117,89 @@ void show_parks(park_index *parks) {
 	}
 }
 
-bool exists_park(unsigned long park_hash, park_index *parks) {
+bool exists_park(char *name, unsigned long name_hash, park_index *parks) {
 	int i;
 	park *current = parks->first;
 	for (i = 0; i < parks->park_num; i++) {
-		if (park_hash == current->hashed_name) return TRUE;
+		if (name_hash == current->hashed_name) {
+			if (strcmp(name, current->name)) return TRUE;
+		}
 		current = current->next;
 	}
 
 	return FALSE;
+}
+
+park *find_park(char *name, unsigned long name_hash, park_index *parks) {
+	int i;
+	park *current = parks->first;
+	for (i = 0; i < parks->park_num; i++) {
+		if (name_hash == current->hashed_name) {
+			if (strcmp(name, current->name) == 0) return current;
+		}
+		current = current->next;
+	}
+
+	// TODO: Find way to return a pointer of a pointer (reference of a pointer);
+
+	return NULL;
+}
+
+void add_vehicle(
+	char *license_plate, date *day_registry, park **entry_park,
+	vehicle_index *vehicles
+) {
+	// Allocate memory for new park and initialize its fields
+	vehicle *new_vehicle = malloc(sizeof(vehicle));
+
+	new_vehicle->license_plate = license_plate;
+	new_vehicle->hashed_plate = hash(license_plate);
+	new_vehicle->history_dates = malloc(sizeof(date) * 10);
+	new_vehicle->history_parks = malloc(sizeof(park **) * 10);
+	new_vehicle->history_dates[0] = *day_registry;
+	new_vehicle->history_parks[0] = entry_park;
+
+	// Add new park to the end of the linked list
+	if (vehicles->vehicle_num == 0) {
+		vehicles->first = new_vehicle;
+		vehicles->last = new_vehicle;
+		new_vehicle->previous = NULL;
+	} else {
+		new_vehicle->previous = vehicles->last;
+		vehicles->last->next = new_vehicle;
+		vehicles->last = new_vehicle;
+	}
+
+	vehicles->vehicle_num++;
+}
+
+void remove_vehicle(vehicle *vehicle_del, vehicle_index *vehicles) {
+	// If the vehicle is NULL, there's nothing to remove
+	if (vehicle_del == NULL) return;
+
+	// If the vehicle isnt the first update next
+	if (vehicle_del->previous != NULL) {
+		vehicle_del->previous->next = vehicle_del->next;
+	} else {
+		if (vehicle_del->next != NULL) {
+			vehicle_del->next->previous = NULL;
+		}
+		vehicles->first = vehicle_del->next;
+	}
+
+	// If the vehicle isnt the last update previous
+	if (vehicle_del->next != NULL) {
+		vehicle_del->next->previous = vehicle_del->previous;
+	} else {
+		if (vehicle_del->previous != NULL) {
+			vehicle_del->previous->next = NULL;
+		}
+		vehicles->last = vehicle_del->previous;
+	}
+
+	// Free the memory for the vehicle's registry and the vehicle itself
+	free(vehicle_del->history_dates);
+	free(vehicle_del->history_parks);
+	free(vehicle_del);
+	vehicles->vehicle_num--;
 }

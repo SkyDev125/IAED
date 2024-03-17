@@ -18,7 +18,7 @@
 /// @{
 
 /// Frees all allocated memory.
-void free_all(park_index *parks) ;
+void free_all(park_index *parks, vehicle_index *vehicles);
 
 /// Increases the capacity of a string.
 int grow_string_cap(char **string, size_t *string_size);

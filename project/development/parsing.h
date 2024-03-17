@@ -31,7 +31,11 @@ char *delimit(char *str, char delimiter);
 /// Parses a string from the given input
 char *parse_string(char *str_start, char **str_end, int *size);
 
-int str_size(char *args);
+/// Finds the size of a string through its pointers
+int str_size(char **args);
+
+/// Validates a licence plate
+bool is_licence_plate(char *str);
 
 /// @}
 

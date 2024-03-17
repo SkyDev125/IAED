@@ -21,6 +21,7 @@
 int menu() {
 	char buffer[MAX_LINE_BUFF + 1], *command;
 	park_index parks = {NULL, NULL, 0};
+	vehicle_index vehicles = {NULL, NULL, 0};
 
 	// Main menu loop
 	while (TRUE) {
@@ -28,7 +29,7 @@ int menu() {
 			return UNEXPECTED_INPUT;
 
 		command = remove_whitespaces(buffer);
-		if (run_command(command, &parks) == SUCCESSFUL_EXIT) break;
+		if (run_command(command, &parks, &vehicles) == SUCCESSFUL_EXIT) break;
 	}
 
 	free_all(&parks);
@@ -45,7 +46,7 @@ int menu() {
  * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT if
  * the 'q' command is received.
  */
-int run_command(char *command, park_index *parks) {
+int run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 	// Point to args
 	char *args = command;
 	args = remove_whitespaces(++args);
@@ -56,15 +57,15 @@ int run_command(char *command, park_index *parks) {
 	case CREATE_OR_VIEW:
 		return run_p(args, parks);
 	case ADD_VEHICLE:
-		break;
+		return run_e(args, parks, vehicles);
 	case REMOVE_VEHICLE:
-		break;
+		return run_s(args, parks, vehicles);
 	case VIEW_VEHICLE:
-		break;
+		return run_v(args, parks, vehicles);
 	case PARK_BILLING:
-		break;
+		return run_f(args, parks, vehicles);
 	case REMOVE_PARK:
-		break;
+		return run_r(args, parks);
 	default:
 		return UNEXPECTED_INPUT;
 	}

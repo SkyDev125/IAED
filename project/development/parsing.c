@@ -28,14 +28,13 @@ char *delimit(char *str, char delimiter) {
 		current++;
 	}
 
+	if ((int)*current == '\0') current--;
+
 	return current;
 }
 
 char *parse_string(char *str_start, char **str_end, int *size) {
-	char *str;
-
-	if (str_start[0] == '"') (*size)++;
-	str = malloc(sizeof(char) * (*size + 1));
+	char *str = malloc(sizeof(char) * (*size + 1));
 
 	strncpy(str, str_start, *size);
 	str[*size] = '\0';
@@ -44,12 +43,32 @@ char *parse_string(char *str_start, char **str_end, int *size) {
 	return str;
 }
 
-int str_size(char *args) {
+int str_size(char **args) {
 	char *end_args;
-	if (args[0] != '"')
-		end_args = delimit(args, ' ');
+	if ((*args)[0] != '"')
+		end_args = delimit(*args, ' ');
 	else
-		end_args = delimit(args + 1, '"');
+		end_args = delimit(++(*args), '"');
 
-	return end_args - args;
+	return end_args - *args;
+}
+
+bool is_licence_plate(char *str) {
+	bool number_pair = FALSE, letter_pair = FALSE;
+
+	while (str < str + LICENCE_PLATE_SIZE) {
+		if (*(str + 2) != '-' && str + 2 < str + LICENCE_PLATE_SIZE)
+			return FALSE;
+
+		if (isalpha(*str) && isalpha(*(str + 1))) {
+			letter_pair = TRUE;
+		} else if (isdigit(*str) && isdigit(*(str + 1))) {
+			number_pair = TRUE;
+		} else
+			return FALSE;
+
+		str += 3;
+	}
+
+	return number_pair && letter_pair;
 }

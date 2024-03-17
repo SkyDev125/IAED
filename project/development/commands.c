@@ -30,7 +30,7 @@ int run_p(char *args, park_index *parks) {
 	}
 
 	// Get the arguments necessary
-	name_size = str_size(args);
+	name_size = str_size(&args);
 	name = parse_string(args, &args, &name_size);
 	capacity = strtol(args, &args, 0);
 	first_value = strtof(args, &args);
@@ -38,7 +38,7 @@ int run_p(char *args, park_index *parks) {
 	day_value = strtof(args, &args);
 
 	// Error checking
-	if (exists_park(hash(name), parks)) {
+	if (exists_park(name, hash(name), parks)) {
 		sprintf(err, "%s: parking already exists.\n", name);
 	} else if (capacity <= 0) {
 		sprintf(err, "%i: invalid capacity.\n", capacity);
@@ -54,6 +54,153 @@ int run_p(char *args, park_index *parks) {
 	}
 
 	add_park(name, &capacity, &first_value, &value, &day_value, parks);
+
+	return SUCCESSFUL;
+}
+
+int run_e(char *args, park_index *parks, vehicle_index *vehicles) {
+	int name_size = str_size(&args);
+	char *name = parse_string(args, &args, &name_size),
+		 license_plate[LICENCE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
+	date timestamp;
+	park *parking;
+
+	args = remove_whitespaces(args);
+	strncpy(license_plate, args, LICENCE_PLATE_SIZE);
+
+	args += LICENCE_PLATE_SIZE;
+	args = remove_whitespaces(args);
+	sscanf(
+		args, "%2d-%2d-%4d", &timestamp.days, &timestamp.months,
+		&timestamp.years
+	);
+
+	args += DATE_MAX_SIZE;
+	args = remove_whitespaces(args);
+	sscanf(args, "%2d:%2d", &timestamp.hours, &timestamp.minutes);
+
+	if ((parking = find_park(name, hash(name), parks)) == NULL) {
+		sprintf(err, "%s: no such parking.\n", name);
+	} else if (parking->capacity == 0) {
+		sprintf(err, "%s: parking is full.\n", name);
+	} else if (is_licence_plate(license_plate)) {
+		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	}
+	// TODO: Check if vehicle is in another park
+	// TODO: Check if date is older than most recent
+
+	if (err[0] != '\0') {
+		printf("%s", err);
+		return UNEXPECTED_INPUT;
+	}
+
+	// TODO: Make vehicle enter the park. (register in park and in vehicle)
+
+	return SUCCESSFUL;
+}
+
+int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
+	int name_size = str_size(&args);
+	char *name = parse_string(args, &args, &name_size),
+		 license_plate[LICENCE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
+	date timestamp;
+	park *parking;
+
+	args = remove_whitespaces(args);
+	strncpy(license_plate, args, LICENCE_PLATE_SIZE);
+
+	args += LICENCE_PLATE_SIZE;
+	args = remove_whitespaces(args);
+	sscanf(
+		args, "%2d-%2d-%4d", &timestamp.days, &timestamp.months,
+		&timestamp.years
+	);
+
+	args += DATE_MAX_SIZE;
+	args = remove_whitespaces(args);
+	sscanf(args, "%2d:%2d", &timestamp.hours, &timestamp.minutes);
+
+	if ((parking = find_park(name, hash(name), parks)) == NULL) {
+		sprintf(err, "%s: no such parking.\n", name);
+	} else if (is_licence_plate(license_plate)) {
+		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	}
+	// TODO: Check if vehicle plate is in this park
+	// TODO: Check if date is older than most recent
+
+	if (err[0] != '\0') {
+		printf("%s", err);
+		return UNEXPECTED_INPUT;
+	}
+
+	// TODO: Make vehicle leave the park
+
+	return SUCCESSFUL;
+}
+
+int run_v(char *args, park_index *parks, vehicle_index *vehicles) {
+	char license_plate[9], err[MAX_LINE_BUFF] = {};
+	strncpy(license_plate, args, LICENCE_PLATE_SIZE);
+
+	if (is_licence_plate(license_plate)) {
+		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	}
+
+	if (err[0] != '\0') {
+		printf("%s", err);
+		return UNEXPECTED_INPUT;
+	}
+	// TODO: Check if the license plate exists
+
+	// TODO: List all entries/exits, order by park name, and then by Date and
+	// Hour.
+
+	return SUCCESSFUL;
+}
+
+int run_f(char *args, park_index *parks, vehicle_index *vehicles) {
+	int name_size = str_size(&args), read_num;
+	char *name = parse_string(args, &args, &name_size), err[MAX_LINE_BUFF] = {};
+	date timestamp;
+	park *parking;
+
+	read_num = sscanf(
+		args, "%2d-%2d-%4d", &timestamp.days, &timestamp.months,
+		&timestamp.years
+	);
+
+	if ((parking = find_park(name, hash(name), parks)) == NULL) {
+		sprintf(err, "%s: no such parking.\n", name);
+	}
+
+	if (err[0] != '\0') {
+		printf("%s", err);
+		return UNEXPECTED_INPUT;
+	}
+
+	if (read_num != 3) {
+		// TODO: Order by date
+	} else {
+		// TODO: Order by hour in date
+	}
+
+	return SUCCESSFUL;
+}
+
+int run_r(char *args, park_index *parks) {
+	int name_size = str_size(&args);
+	char *name = parse_string(args, &args, &name_size);
+	park *parking;
+
+	parking = find_park(name, hash(name), parks);
+	if (parking == NULL) {
+		printf("%s: no such parking.\n", name);
+		return UNEXPECTED_INPUT;
+	}
+
+	remove_park(parking, parks);
+
+	// TODO: PRINT PARKS IN ALPHABETICAL ORDER
 
 	return SUCCESSFUL;
 }

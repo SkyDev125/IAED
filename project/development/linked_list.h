@@ -12,14 +12,25 @@
 #ifndef LINKED_LIST
 #define LINKED_LIST
 
+// Forward declaration of vehicle
+typedef struct vehicle_struct vehicle;
+
+/// Structure to represent a date.
+typedef struct {
+	long int total_mins;
+	int years, months, days, hours, minutes;
+} date;
+
 /// Structure to represent a parking lot.
-typedef struct parking {
+typedef struct park_struct {
 	char *name;
 	unsigned long hashed_name;
 	int capacity, free_spaces;
 	float first_hour_value, value, day_value;
-	struct parking *next;
-	struct parking *previous;
+	vehicle *history_vehicles;
+	date *history_dates;
+	struct park_struct *next;
+	struct park_struct *previous;
 } park;
 
 /// Structure to represent an index of parking lots.
@@ -27,6 +38,22 @@ typedef struct {
 	park *first, *last;
 	int park_num;
 } park_index;
+
+/// Structure to represent a vehicle.
+typedef struct vehicle_struct {
+	char *license_plate;
+	unsigned long hashed_plate;
+	park ***history_parks; // array of pointers that points to parks
+	date *history_dates;
+	struct vehicle_struct *next;
+	struct vehicle_struct *previous;
+} vehicle;
+
+/// Structure to represent an index of vehicles.
+typedef struct {
+	vehicle *first, *last;
+	int vehicle_num;
+} vehicle_index;
 
 /// @defgroup park_operations Parking Lot Operations
 /// @{
@@ -43,11 +70,15 @@ void remove_park(park *parking, park_index *parks);
 /// Returns the total number of parking lots in the list.
 void show_parks(park_index *parks);
 
-bool exists_park(unsigned long park_hash, park_index *parks);
+bool exists_park(char *name, unsigned long name_hash, park_index *parks);
+
+park *find_park(char *name, unsigned long park_hash, park_index *parks);
+
+/// @}
 
 /// Hashes a string.
 unsigned long hash(char *str);
 
-/// @}
+void remove_vehicle(vehicle *vehicle_del, vehicle_index *vehicles);
 
 #endif
