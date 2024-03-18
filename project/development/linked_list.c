@@ -52,6 +52,7 @@ void add_park(
 	new_park->value = *value;
 	new_park->day_value = *day_value;
 	new_park->registries.type = UNDEFINED;
+	new_park->registries.next = NULL;
 	new_park->next = NULL;
 
 	// Add new park to the end of the linked list
@@ -136,6 +137,7 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	strncpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
 	new_vehicle->hashed_plate = hash(license_plate);
 	new_vehicle->registries.type = UNDEFINED;
+	new_vehicle->registries.next = NULL;
 	new_vehicle->next = NULL;
 
 	// Add new park to the end of the linked list
@@ -225,14 +227,39 @@ vehicle *find_vehicle(
 	return NULL;
 }
 
+// vehicle *find_vehicle_in_park(
+// 	char *license_plate, unsigned long license_plate_hash, park_index *parks
+// ) {
+// 	int i;
+// 	registry *current = &(parks->first->registries);
+// 	vehicle *temp_vehicle;
+
+// 	if (current->type == ENTER) {
+// 		temp_vehicle = current->registration->enter.vehicle_ptr;
+// 		if (license_plate_hash == temp_vehicle->hashed_plate) {
+// 			if (strcmp(license_plate, temp_vehicle->license_plate) == 0)
+// 				return temp_vehicle;
+// 		}
+// 	}
+
+// 	while (current->next != NULL) {
+// 		temp_vehicle = current->next->registration->enter.vehicle_ptr;
+// 		if (current->type == ENTER) {
+// 			temp_vehicle = current->registration->enter.vehicle_ptr;
+// 			if (license_plate_hash == temp_vehicle->hashed_plate) {
+// 				if (strcmp(license_plate, temp_vehicle->license_plate) == 0)
+// 					return temp_vehicle;
+// 			}
+// 		}
+
+// 		return NULL;
+// 	}
+
 void register_entrance(
 	char *license_plate, vehicle_index *vehicles, park *park_enter,
-	date *timestamp
+	date *timestamp, vehicle *reg_vehicle
 ) {
-	vehicle *reg_vehicle;
 	registry_union *entry;
-
-	reg_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
 
 	// create vehicle if it doesnt exist
 	if (reg_vehicle == NULL) {
@@ -250,21 +277,19 @@ void register_entrance(
 }
 
 void register_exit(
-	char *license_plate, vehicle_index *vehicles, park *park_enter,
-	date *timestamp, float *cost
+	park *park_enter, date *timestamp, vehicle *reg_vehicle, float *cost
 ) {
-	vehicle *reg_vehicle;
-	registry_union entry;
+	registry_union *entry;
 
-	reg_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
+	entry = malloc(sizeof(registry_union));
+	entry->exit.park_ptr = park_enter;
+	entry->exit.vehicle_ptr = reg_vehicle;
+	entry->exit.timestamp = *timestamp;
+	entry->exit.cost = *cost;
 
-	entry.exit.park_ptr = park_enter;
-	entry.exit.vehicle_ptr = reg_vehicle;
-	entry.exit.timestamp = *timestamp;
-	entry.exit.cost = *cost;
-
-	add_entry(&(reg_vehicle->registries), &entry, EXIT);
-	add_entry(&(park_enter->registries), &entry, EXIT);
+	add_entry(&(reg_vehicle->registries), entry, EXIT);
+	add_entry(&(park_enter->registries), entry, EXIT);
+	(park_enter->free_spaces)++;
 }
 
 void add_entry(registry *reg, registry_union *entry, char type) {
@@ -286,6 +311,8 @@ void add_entry(registry *reg, registry_union *entry, char type) {
 }
 
 registry *get_last_registry(registry *reg) {
+	if (reg == NULL) return reg;
+
 	while (reg->next != NULL) {
 		reg = reg->next;
 	}

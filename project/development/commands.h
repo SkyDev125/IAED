@@ -26,13 +26,23 @@ int run_p(char *args, park_index *parks);
 int run_e(char *args, park_index *parks, vehicle_index *vehicles);
 
 void run_e_errochecking(
-	park *parking, char *name, char *err, char *license_plate,
-	vehicle_index *vehicles, date *timestamp
+	park *parking, char *name, char *err, char *license_plate, date *timestamp,
+	vehicle *temp_vehicle
 );
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
 /// exit of a vehicle
 int run_s(char *args, park_index *parks, vehicle_index *vehicles);
+
+void run_s_args(
+	char **args, char **name, char *license_plate, date *timestamp,
+	park **parking, park_index *parks
+);
+
+void run_s_errochecking(
+	park *parking, char *name, char *err, char *license_plate, date *timestamp,
+	vehicle *temp_vehicle, registry **last_vehicle_registry
+);
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information
@@ -48,6 +58,6 @@ int run_r(char *args, park_index *parks);
 
 /// @}
 
-void verify_date_registry(park *parking, char *err, date *timestamp);
+void verify_date_registry(registry *last_reg, char *err, date *timestamp);
 
 #endif

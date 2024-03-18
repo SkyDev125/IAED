@@ -85,6 +85,12 @@ enum commands {
 /// Maximum size of hour
 #define HOUR_MAX_SIZE 5
 
+/// Step in minutes for counting the cost
+#define PARK_PAY_STEP 15
+
+/// Blocks of time that will be counted at a different price
+#define TOTAL_INITIAL_BLOCKS 4
+
 /// @}
 
 /// @defgroup exit_codes Exit code constants
@@ -122,11 +128,7 @@ typedef char bool;
 /// @{
 
 /// Valid Registry types
-typedef enum registry_types_e {
-	ENTER,
-	EXIT,
-	UNDEFINED
-} registry_types;
+typedef enum registry_types_e { ENTER, EXIT, UNDEFINED } registry_types;
 
 /// @}
 

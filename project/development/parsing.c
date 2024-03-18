@@ -85,9 +85,7 @@ bool is_licence_plate(char *str) {
 	bool number_pair = FALSE, letter_pair = FALSE;
 	char *original_str = str;
 
-	while (str < str + LICENSE_PLATE_SIZE) {
-		if (*(str + 2) != '-' && str + 2 > original_str + LICENSE_PLATE_SIZE)
-			break;
+	while (str < original_str + LICENSE_PLATE_SIZE) {
 
 		if (isalpha(*str) && isalpha(*(str + 1))) {
 			letter_pair = TRUE;
@@ -95,6 +93,8 @@ bool is_licence_plate(char *str) {
 			number_pair = TRUE;
 		} else
 			return FALSE;
+
+		if (*(str + 2) != '-') break;
 
 		str += 3;
 	}
@@ -121,8 +121,42 @@ long int date_to_minutes(date *d) {
 bool is_valid_date(date *d) {
 	if (d->months < 1 || d->months > 12) return FALSE;
 	if (d->days > days_in_month[d->months - 1] || d->days < 1) return FALSE;
-	if (d->hours > 24 || d->hours < 0) return FALSE;
-	if (d->minutes > 60 || d->minutes < 0) return FALSE;
+	if (d->hours >= 24 || d->hours < 0) return FALSE;
+	if (d->minutes >= 60 || d->minutes < 0) return FALSE;
 
 	return TRUE;
+}
+
+float calculate_cost(date *start, date *end, park *parking) {
+	int minutes_to_pay = (end->total_mins - start->total_mins), i;
+	float cost;
+	bool limit = FALSE;
+
+	// Pay for the days
+	cost = (minutes_to_pay / (MINS_PER_DAY)) * parking->day_value;
+	minutes_to_pay = minutes_to_pay % (MINS_PER_DAY);
+
+	// Limit price to max of day
+	if (cost == 0) limit = TRUE;
+
+	// Pay for the first hour
+	for (i = 0; i < TOTAL_INITIAL_BLOCKS; i++) {
+		if (minutes_to_pay == 0) {
+			break;
+		} else if (minutes_to_pay < PARK_PAY_STEP) {
+			cost += parking->first_hour_value;
+		}
+		cost += parking->first_hour_value;
+		minutes_to_pay -= PARK_PAY_STEP;
+	}
+
+	// Pay for the remaining hours
+	cost += (minutes_to_pay / PARK_PAY_STEP) * parking->value;
+	minutes_to_pay = (minutes_to_pay % PARK_PAY_STEP);
+
+	if (minutes_to_pay != 0) {
+		cost = cost + parking->value;
+	}
+
+	return limit && (cost > parking->day_value) ? parking->day_value : cost;
 }

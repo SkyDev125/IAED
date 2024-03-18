@@ -129,12 +129,11 @@ vehicle *find_vehicle(
 
 void register_entrance(
 	char *license_plate, vehicle_index *vehicles, park *park_enter,
-	date *timestamp
+	date *timestamp, vehicle *reg_vehicle
 );
 
 void register_exit(
-	char *license_plate, vehicle_index *vehicles, park *park_enter,
-	date *timestamp, float *cost
+	park *park_enter, date *timestamp, vehicle *reg_vehicle, float *cost
 );
 
 void add_entry(registry *reg, registry_union *entry, char type);

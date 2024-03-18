@@ -58,8 +58,8 @@ int run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 		return run_p(args, parks);
 	case ADD_VEHICLE:
 		return run_e(args, parks, vehicles);
-	// case REMOVE_VEHICLE:
-	// 	return run_s(args, parks, vehicles);
+	case REMOVE_VEHICLE:
+		return run_s(args, parks, vehicles);
 	// case VIEW_VEHICLE:
 	// 	return run_v(args, parks, vehicles);
 	// case PARK_BILLING:

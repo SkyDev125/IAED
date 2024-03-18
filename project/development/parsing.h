@@ -49,4 +49,6 @@ bool is_valid_date(date *d);
 
 /// @}
 
+float calculate_cost(date *start, date *end, park *parking);
+
 #endif
