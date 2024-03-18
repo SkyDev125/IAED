@@ -83,10 +83,11 @@ int str_size(char **args) {
 
 bool is_licence_plate(char *str) {
 	bool number_pair = FALSE, letter_pair = FALSE;
+	char *original_str = str;
 
 	while (str < str + LICENSE_PLATE_SIZE) {
-		if (*(str + 2) != '-' && str + 2 < str + LICENSE_PLATE_SIZE)
-			return FALSE;
+		if (*(str + 2) != '-' && str + 2 > original_str + LICENSE_PLATE_SIZE)
+			break;
 
 		if (isalpha(*str) && isalpha(*(str + 1))) {
 			letter_pair = TRUE;

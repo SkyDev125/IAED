@@ -48,4 +48,6 @@ int run_r(char *args, park_index *parks);
 
 /// @}
 
+void verify_date_registry(park *parking, char *err, date *timestamp);
+
 #endif

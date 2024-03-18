@@ -45,7 +45,7 @@ typedef union {
 
 typedef struct registration {
 	registry_union *registration;
-	char type;
+	registry_types type;
 	struct registration *next;
 } registry;
 

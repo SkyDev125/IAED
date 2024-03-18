@@ -121,14 +121,12 @@ typedef char bool;
 /// @defgroup Registry related constants
 /// @{
 
-// Entry identifier
-#define ENTER 1
-
-// Exit identifier
-#define EXIT 0
-
-// State to define that registry isnt initialized
-#define UNDEFINED 2
+/// Valid Registry types
+typedef enum registry_types_e {
+	ENTER,
+	EXIT,
+	UNDEFINED
+} registry_types;
 
 /// @}
 

@@ -82,6 +82,7 @@ int run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 	}
 
 	register_entrance(license_plate, vehicles, parking, &timestamp);
+	printf("%s %i\n", name, parking->free_spaces);
 
 	free(name);
 	return SUCCESSFUL;
@@ -92,25 +93,42 @@ void run_e_errochecking(
 	vehicle_index *vehicles, date *timestamp
 ) {
 	vehicle *temp_vehicle;
-	registry *last_registry;
+	registry *last_vehicle_registry;
 
 	if (parking == NULL) {
 		sprintf(err, "%s: no such parking.\n", name);
+		return;
 	} else if (parking->free_spaces == 0) {
 		sprintf(err, "%s: parking is full.\n", name);
-	} else if (is_licence_plate(license_plate)) {
+		return;
+	} else if (!is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+		return;
 	}
 
 	temp_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
 	if (temp_vehicle != NULL) {
-		last_registry = get_last_registry(&temp_vehicle->registries);
-		if (last_registry->type != EXIT) {
+		last_vehicle_registry = get_last_registry(&(temp_vehicle->registries));
+		if (last_vehicle_registry->type != EXIT) {
 			sprintf(err, "%s: invalid vehicle entry.\n", license_plate);
-		} else if (
-			last_registry->registration->exit.timestamp.total_mins > 
-			timestamp->total_mins || !is_valid_date(timestamp)
-		) {
+			return;
+		}
+	}
+
+	verify_date_registry(parking, err, timestamp);
+}
+
+void verify_date_registry(park *parking, char *err, date *timestamp) {
+	registry *last_park_registry;
+	last_park_registry = get_last_registry(&(parking->registries));
+	if (last_park_registry->type != UNDEFINED) {
+		if ((last_park_registry->type == ENTER &&
+			 last_park_registry->registration->enter.timestamp.total_mins >
+				 timestamp->total_mins) ||
+			(last_park_registry->type == EXIT &&
+			 last_park_registry->registration->exit.timestamp.total_mins >
+				 timestamp->total_mins) ||
+			!is_valid_date(timestamp)) {
 			sprintf(err, "invalid date.\n");
 		}
 	}
