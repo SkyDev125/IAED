@@ -116,3 +116,12 @@ long int date_to_minutes(date *d) {
 
 	return minutes;
 }
+
+bool is_valid_date(date *d) {
+	if (d->months < 1 || d->months > 12) return FALSE;
+	if (d->days > days_in_month[d->months - 1] || d->days < 1) return FALSE;
+	if (d->hours > 24 || d->hours < 0) return FALSE;
+	if (d->minutes > 60 || d->minutes < 0) return FALSE;
+
+	return TRUE;
+}

@@ -77,11 +77,13 @@ int run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 	run_e_errochecking(parking, name, err, license_plate, vehicles, &timestamp);
 	if (err[0] != '\0') {
 		printf("%s", err);
+		free(name);
 		return UNEXPECTED_INPUT;
 	}
 
-	register_entrance(license_plate, vehicles, &parking, &timestamp);
+	register_entrance(license_plate, vehicles, parking, &timestamp);
 
+	free(name);
 	return SUCCESSFUL;
 }
 
@@ -94,7 +96,7 @@ void run_e_errochecking(
 
 	if (parking == NULL) {
 		sprintf(err, "%s: no such parking.\n", name);
-	} else if (parking->capacity == 0) {
+	} else if (parking->free_spaces == 0) {
 		sprintf(err, "%s: parking is full.\n", name);
 	} else if (is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
@@ -106,8 +108,8 @@ void run_e_errochecking(
 		if (last_registry->type != EXIT) {
 			sprintf(err, "%s: invalid vehicle entry.\n", license_plate);
 		} else if (
-			last_registry->registration.exit.timestamp.total_mins > 
-			timestamp->total_mins
+			last_registry->registration->exit.timestamp.total_mins > 
+			timestamp->total_mins || !is_valid_date(timestamp)
 		) {
 			sprintf(err, "invalid date.\n");
 		}

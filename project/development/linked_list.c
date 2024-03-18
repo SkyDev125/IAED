@@ -72,6 +72,10 @@ void remove_park(park *parking, park_index *parks) {
 	// If the park is NULL, there's nothing to remove
 	if (parking == NULL) return;
 
+	if (parking->registries.type != UNDEFINED) {
+		clean_park_registries(&(parking->registries));
+	}
+
 	// If the park isnt the first update next
 	if (parking->previous != NULL) {
 		parking->previous->next = parking->next;
@@ -96,9 +100,6 @@ void remove_park(park *parking, park_index *parks) {
 	free(parking->name);
 	free(parking);
 	parks->park_num--;
-
-	// Set the pointer to NULL
-	parking = NULL;
 }
 
 /**
@@ -135,6 +136,7 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	strncpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
 	new_vehicle->hashed_plate = hash(license_plate);
 	new_vehicle->registries.type = UNDEFINED;
+	new_vehicle->next = NULL;
 
 	// Add new park to the end of the linked list
 	if (vehicles->vehicle_num == 0) {
@@ -151,15 +153,11 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 
 void remove_vehicle(vehicle_index *vehicles) {
 	vehicle *vehicle_del = vehicles->first;
-	registry *temp_reg;
 	// If the vehicle is NULL, there's nothing to remove
 	if (vehicle_del == NULL) return;
 
-	// Clean the registries
-	while (vehicle_del->registries.next != NULL) {
-		temp_reg = vehicle_del->registries.next->next;
-		free(vehicle_del->registries.next);
-		vehicle_del->registries.next = temp_reg;
+	if (vehicles->first->registries.type != UNDEFINED) {
+		clean_vehicle_registries(&(vehicles->first->registries));
 	}
 
 	// Clean the indexes
@@ -171,6 +169,43 @@ void remove_vehicle(vehicle_index *vehicles) {
 	// Free the memory for the vehicle's registry and the vehicle itself
 	free(vehicle_del);
 	vehicles->vehicle_num--;
+}
+
+void clean_park_registries(registry *reg) {
+	registry *temp_reg;
+
+	if ((*reg).type == ENTER) {
+		(*reg).registration->enter.park_ptr = NULL;
+	} else if ((*reg).type == EXIT) {
+		(*reg).registration->exit.park_ptr = NULL;
+	}
+
+	while ((*reg).next != NULL) {
+		temp_reg = (*reg).next->next;
+
+		if ((*reg).next->type == ENTER) {
+			(*reg).next->registration->enter.park_ptr = NULL;
+		} else if ((*reg).next->type == EXIT) {
+			(*reg).next->registration->exit.park_ptr = NULL;
+		}
+
+		free((*reg).next);
+		(*reg).next = temp_reg;
+	}
+}
+
+void clean_vehicle_registries(registry *reg) {
+	registry *next_reg = (*reg).next;
+	registry *temp_reg;
+
+	free((*reg).registration);
+
+	while (next_reg != NULL) {
+		temp_reg = next_reg->next;
+		free(next_reg->registration);
+		free(next_reg);
+		next_reg = temp_reg;
+	}
 }
 
 vehicle *find_vehicle(
@@ -191,11 +226,11 @@ vehicle *find_vehicle(
 }
 
 void register_entrance(
-	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	char *license_plate, vehicle_index *vehicles, park *park_enter,
 	date *timestamp
 ) {
 	vehicle *reg_vehicle;
-	registry_union entry;
+	registry_union *entry;
 
 	reg_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
 
@@ -204,16 +239,18 @@ void register_entrance(
 		reg_vehicle = add_vehicle(license_plate, vehicles);
 	}
 
-	entry.enter.park_ptr = park_enter;
-	entry.enter.vehicle_ptr = reg_vehicle;
-	entry.enter.timestamp = *timestamp;
+	entry = malloc(sizeof(registry_union));
+	entry->enter.park_ptr = park_enter;
+	entry->enter.vehicle_ptr = reg_vehicle;
+	entry->enter.timestamp = *timestamp;
 
-	add_entry(&(reg_vehicle->registries), &entry, ENTER);
-	add_entry(&((*park_enter)->registries), &entry, ENTER);
+	add_entry(&(reg_vehicle->registries), entry, ENTER);
+	add_entry(&(park_enter->registries), entry, ENTER);
+	(park_enter->free_spaces)--;
 }
 
 void register_exit(
-	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	char *license_plate, vehicle_index *vehicles, park *park_enter,
 	date *timestamp, float *cost
 ) {
 	vehicle *reg_vehicle;
@@ -227,7 +264,7 @@ void register_exit(
 	entry.exit.cost = *cost;
 
 	add_entry(&(reg_vehicle->registries), &entry, EXIT);
-	add_entry(&((*park_enter)->registries), &entry, EXIT);
+	add_entry(&(park_enter->registries), &entry, EXIT);
 }
 
 void add_entry(registry *reg, registry_union *entry, char type) {
@@ -236,12 +273,12 @@ void add_entry(registry *reg, registry_union *entry, char type) {
 	if (reg->type == UNDEFINED) {
 		reg->type = type;
 		reg->next = NULL;
-		reg->registration = *entry;
+		reg->registration = entry;
 	} else {
 		new_registry = malloc(sizeof(registry));
 		new_registry->next = NULL;
 		new_registry->type = type;
-		new_registry->registration = *entry;
+		new_registry->registration = entry;
 
 		temp_registry = get_last_registry(reg);
 		temp_registry->next = new_registry;

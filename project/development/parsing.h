@@ -45,6 +45,8 @@ bool is_licence_plate(char *str);
 
 long int date_to_minutes(date *d);
 
+bool is_valid_date(date *d);
+
 /// @}
 
 #endif

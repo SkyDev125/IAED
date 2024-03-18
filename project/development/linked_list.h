@@ -27,13 +27,13 @@ typedef struct {
 
 typedef struct {
 	vehicle *vehicle_ptr;
-	park **park_ptr;
+	park *park_ptr;
 	date timestamp;
 } registry_enter;
 
 typedef struct {
 	vehicle *vehicle_ptr;
-	park **park_ptr;
+	park *park_ptr;
 	date timestamp;
 	float cost;
 } registry_exit;
@@ -44,7 +44,7 @@ typedef union {
 } registry_union;
 
 typedef struct registration {
-	registry_union registration;
+	registry_union *registration;
 	char type;
 	struct registration *next;
 } registry;
@@ -118,18 +118,22 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles);
 
 void remove_vehicle(vehicle_index *vehicles);
 
+void clean_park_registries(registry *reg);
+
+void clean_vehicle_registries(registry *reg);
+
 vehicle *find_vehicle(
 	char *license_plate, unsigned long license_plate_hash,
 	vehicle_index *vehicles
 );
 
 void register_entrance(
-	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	char *license_plate, vehicle_index *vehicles, park *park_enter,
 	date *timestamp
 );
 
 void register_exit(
-	char *license_plate, vehicle_index *vehicles, park **park_enter,
+	char *license_plate, vehicle_index *vehicles, park *park_enter,
 	date *timestamp, float *cost
 );
 
