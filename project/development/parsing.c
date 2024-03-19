@@ -129,34 +129,39 @@ bool is_valid_date(date *d) {
 
 float calculate_cost(date *start, date *end, park *parking) {
 	int minutes_to_pay = (end->total_mins - start->total_mins), i;
-	float cost;
-	bool limit = FALSE;
+	float cost, day_cost = 0;
 
 	// Pay for the days
 	cost = (minutes_to_pay / (MINS_PER_DAY)) * parking->day_value;
 	minutes_to_pay = minutes_to_pay % (MINS_PER_DAY);
 
-	// Limit price to max of day
-	if (cost == 0) limit = TRUE;
-
 	// Pay for the first hour
 	for (i = 0; i < TOTAL_INITIAL_BLOCKS; i++) {
 		if (minutes_to_pay == 0) {
 			break;
-		} else if (minutes_to_pay < PARK_PAY_STEP) {
-			cost += parking->first_hour_value;
+		} else if (minutes_to_pay <= PARK_PAY_STEP) {
+			day_cost += parking->first_hour_value;
+			minutes_to_pay = 0;
+			break;
 		}
-		cost += parking->first_hour_value;
+		day_cost += parking->first_hour_value;
 		minutes_to_pay -= PARK_PAY_STEP;
 	}
 
 	// Pay for the remaining hours
-	cost += (minutes_to_pay / PARK_PAY_STEP) * parking->value;
+	day_cost += (minutes_to_pay / PARK_PAY_STEP) * parking->value;
 	minutes_to_pay = (minutes_to_pay % PARK_PAY_STEP);
 
 	if (minutes_to_pay != 0) {
-		cost = cost + parking->value;
+		day_cost += parking->value;
 	}
 
-	return limit && (cost > parking->day_value) ? parking->day_value : cost;
+	// Pay only to the daily maximum allowed.
+	if (day_cost > parking->day_value) {
+		cost += parking->day_value;
+	} else {
+		cost += day_cost;
+	}
+
+	return cost;
 }

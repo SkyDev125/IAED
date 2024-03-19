@@ -112,30 +112,15 @@ void run_e_errochecking(
 	}
 
 	if (temp_vehicle != NULL) {
-		last_vehicle_registry = get_last_registry(&(temp_vehicle->registries));
-		if (last_vehicle_registry->type != EXIT) {
+		last_vehicle_registry = temp_vehicle->last_reg;
+		if (last_vehicle_registry == NULL ||
+			last_vehicle_registry->type != EXIT) {
 			sprintf(err, "%s: invalid vehicle entry.\n", license_plate);
 			return;
 		}
 	}
 
-	verify_date_registry(
-		get_last_registry(&(parking->registries)), err, timestamp
-	);
-}
-
-void verify_date_registry(registry *last_reg, char *err, date *timestamp) {
-	if (last_reg->type != UNDEFINED) {
-		if ((last_reg->type == ENTER &&
-			 last_reg->registration->enter.timestamp.total_mins >
-				 timestamp->total_mins) ||
-			(last_reg->type == EXIT &&
-			 last_reg->registration->exit.timestamp.total_mins >
-				 timestamp->total_mins) ||
-			!is_valid_date(timestamp)) {
-			sprintf(err, "invalid date.\n");
-		}
-	}
+	verify_date_registry(parking->last_reg, err, timestamp);
 }
 
 int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
@@ -143,7 +128,6 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 	date timestamp, start_timestamp;
 	park *parking;
 	vehicle *temp_vehicle;
-	registry *last_reg;
 	float cost;
 
 	// Get the necessary arguments
@@ -152,7 +136,7 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 
 	// Error checking
 	run_s_errochecking(
-		parking, name, err, license_plate, &timestamp, temp_vehicle, &last_reg
+		parking, name, err, license_plate, &timestamp, temp_vehicle
 	);
 
 	if (err[0] != '\0') {
@@ -161,8 +145,8 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 		return UNEXPECTED_INPUT;
 	}
 
+	start_timestamp = temp_vehicle->last_reg->registration->enter.timestamp;
 	register_exit(parking, &timestamp, temp_vehicle, &cost);
-	start_timestamp = last_reg->registration->enter.timestamp;
 	cost = calculate_cost(&start_timestamp, &timestamp, parking);
 
 	printf(
@@ -193,8 +177,9 @@ void run_s_args(
 
 void run_s_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, registry **last_vehicle_registry
+	vehicle *temp_vehicle
 ) {
+	registry *last_vehicle_registry;
 
 	if (parking == NULL) {
 		sprintf(err, "%s: no such parking.\n", name);
@@ -205,21 +190,19 @@ void run_s_errochecking(
 	}
 
 	if (temp_vehicle != NULL) {
-		*last_vehicle_registry = get_last_registry(&(temp_vehicle->registries));
+		last_vehicle_registry = temp_vehicle->last_reg;
 	} else {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
 		return;
 	}
 
-	if ((*last_vehicle_registry)->type != ENTER) {
+	if (last_vehicle_registry == NULL || last_vehicle_registry->type != ENTER) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	} else if ((*last_vehicle_registry)->registration->enter.park_ptr != parking) {
+	} else if (last_vehicle_registry->registration->enter.park_ptr != parking) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
 	}
 
-	verify_date_registry(
-		get_last_registry(&(parking->registries)), err, timestamp
-	);
+	verify_date_registry(parking->last_reg, err, timestamp);
 }
 
 // int run_v(char *args, park_index *parks, vehicle_index *vehicles) {
@@ -288,4 +271,18 @@ int run_r(char *args, park_index *parks) {
 	// TODO: PRINT PARKS IN ALPHABETICAL ORDER
 
 	return SUCCESSFUL;
+}
+
+void verify_date_registry(registry *last_reg, char *err, date *timestamp) {
+	if (last_reg != NULL) {
+		if ((last_reg->type == ENTER &&
+			 last_reg->registration->enter.timestamp.total_mins >
+				 timestamp->total_mins) ||
+			(last_reg->type == EXIT &&
+			 last_reg->registration->exit.timestamp.total_mins >
+				 timestamp->total_mins) ||
+			!is_valid_date(timestamp)) {
+			sprintf(err, "invalid date.\n");
+		}
+	}
 }

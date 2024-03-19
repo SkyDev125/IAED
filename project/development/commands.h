@@ -41,7 +41,7 @@ void run_s_args(
 
 void run_s_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, registry **last_vehicle_registry
+	vehicle *temp_vehicle
 );
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle

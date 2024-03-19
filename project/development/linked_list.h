@@ -60,7 +60,8 @@ typedef struct park_struct {
 	unsigned long hashed_name;
 	int capacity, free_spaces;
 	float first_hour_value, value, day_value;
-	registry registries;
+	registry *registries;
+	registry *last_reg;
 	struct park_struct *next;
 	struct park_struct *previous;
 } park;
@@ -75,7 +76,8 @@ typedef struct {
 typedef struct vehicle_struct {
 	char license_plate[LICENSE_PLATE_SIZE + 1];
 	unsigned long hashed_plate;
-	registry registries;
+	registry *registries;
+	registry *last_reg;
 	struct vehicle_struct *next;
 } vehicle;
 
@@ -109,8 +111,6 @@ park *find_park(char *name, unsigned long park_hash, park_index *parks);
 /// Hashes a string.
 unsigned long hash(char *str);
 
-registry *get_last_registry(registry *reg);
-
 /// @defgroup vehicle_operations Vehicle operations
 /// @{
 
@@ -136,7 +136,9 @@ void register_exit(
 	park *park_enter, date *timestamp, vehicle *reg_vehicle, float *cost
 );
 
-void add_entry(registry *reg, registry_union *entry, char type);
+void add_entry(
+	registry **reg, registry **last_reg, registry_union *entry, char type
+);
 
 /// @}
 
