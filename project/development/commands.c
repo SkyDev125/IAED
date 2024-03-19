@@ -263,6 +263,7 @@ int run_r(char *args, park_index *parks) {
 	parking = find_park(name, hash(name), parks);
 	if (parking == NULL) {
 		printf("%s: no such parking.\n", name);
+		free(name);
 		return UNEXPECTED_INPUT;
 	}
 
@@ -270,6 +271,7 @@ int run_r(char *args, park_index *parks) {
 
 	// TODO: PRINT PARKS IN ALPHABETICAL ORDER
 
+	free(name);
 	return SUCCESSFUL;
 }
 

@@ -134,7 +134,7 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	// Allocate memory for new park and initialize its fields
 	vehicle *new_vehicle = malloc(sizeof(vehicle));
 
-	strncpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
+	memcpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
 	new_vehicle->hashed_plate = hash(license_plate);
 	new_vehicle->registries = NULL;
 	new_vehicle->last_reg = NULL;
