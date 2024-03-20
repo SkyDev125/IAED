@@ -119,6 +119,8 @@ enum commands {
 /// False value for comparisons
 #define FALSE 0
 
+#define HASH_SIZE 100
+
 /// Alias for boolean
 typedef char bool;
 

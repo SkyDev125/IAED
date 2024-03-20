@@ -53,11 +53,10 @@ int shrink_string_cap(char **string, size_t *string_size) {
  * @param args A pointer to the memory to be freed.
  */
 void free_all(park_index *parks, vehicle_index *vehicles) {
-	int park_num = parks->park_num, vehicle_num = vehicles->vehicle_num, i;
+	int park_num = parks->park_num, i;
 	for (i = 0; i < park_num; i++) {
 		remove_park(parks->first, parks);
 	}
-	for (i = 0; i < vehicle_num; i++) {
-		remove_vehicle(vehicles);
-	}
+	remove_all_vehicles(vehicles);
+	free(vehicles->buckets);
 }

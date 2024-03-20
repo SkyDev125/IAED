@@ -48,12 +48,12 @@ void run_s_errochecking(
 /// information
 int run_v(char *args, park_index *parks, vehicle_index *vehicles);
 
-/// Function to run the COMMAND_PARK_BILLING command, which shows the billing of
-/// a parking lot
+/// Function to run the COMMAND_PARK_BILLING command, which shows the billing
+/// of a parking lot
 int run_f(char *args, park_index *parks, vehicle_index *vehicles);
 
-/// Function to run the COMMAND_REMOVE_PARK command, which removes a parking lot
-/// from the system
+/// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
+/// lot from the system
 int run_r(char *args, park_index *parks);
 
 /// @}

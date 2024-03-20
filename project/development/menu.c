@@ -21,12 +21,15 @@
 int menu() {
 	char buffer[MAX_LINE_BUFF + 1], *command;
 	park_index parks = {NULL, NULL, 0};
-	vehicle_index vehicles = {NULL, NULL, 0};
+	vehicle_index vehicles = {
+		calloc(HASH_SIZE, sizeof(vehicle *)), HASH_SIZE, 0};
 
 	// Main menu loop
 	while (TRUE) {
-		if (fgets(buffer, MAX_LINE_BUFF + 1, stdin) == NULL)
+		if (fgets(buffer, MAX_LINE_BUFF + 1, stdin) == NULL) {
+			free_all(&parks, &vehicles);
 			return UNEXPECTED_INPUT;
+		}
 
 		command = remove_whitespaces(buffer);
 		if (run_command(command, &parks, &vehicles) == SUCCESSFUL_EXIT) break;
@@ -41,10 +44,11 @@ int menu() {
  *
  * @param command A character representing a valid command specified in
  * VALID_COMMANDS[] in parsing.c.
- * @param args An array of pointers that contains the arguments for the command.
+ * @param args An array of pointers that contains the arguments for the
+ * command.
  * @return SUCCESSFUL if the command executes successfully,
- * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT if
- * the 'q' command is received.
+ * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT
+ * if the 'q' command is received.
  */
 int run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 	// Point to args

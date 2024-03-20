@@ -28,6 +28,35 @@ unsigned long hash(char *str) {
 	return hash;
 }
 
+unsigned long vehicle_hash(char *license_plate, int hash_size) {
+	unsigned long hash = 5381;
+	int c;
+
+	while ((c = *license_plate++))
+		hash = ((hash << 5) + hash) + c;
+
+	return hash % hash_size;
+}
+
+void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
+	vehicle **new_buckets = calloc(new_size, sizeof(vehicle *));
+	for (int i = 0; i < vehicles->size; i++) {
+		vehicle *current_vehicle = vehicles->buckets[i];
+		while (current_vehicle != NULL) {
+			vehicle *next_vehicle = current_vehicle->next;
+			unsigned long new_hash =
+				vehicle_hash(current_vehicle->license_plate, new_size);
+			// Add the vehicle to the front of the list in the new bucket
+			current_vehicle->next = new_buckets[new_hash];
+			new_buckets[new_hash] = current_vehicle;
+			current_vehicle = next_vehicle;
+		}
+	}
+	free(vehicles->buckets);
+	vehicles->buckets = new_buckets;
+	vehicles->size = new_size;
+}
+
 /**
  * @brief Function to add a new park to the linked list.
  *
@@ -111,7 +140,8 @@ void show_parks(park_index *parks) {
 	park *current = parks->first;
 	for (i = 0; i < parks->park_num; i++) {
 		printf(
-			"%s %i %i\n", current->name, current->capacity, current->free_spaces
+			"%s %i %i\n", current->name, current->capacity,
+			current->free_spaces
 		);
 		current = current->next;
 	}
@@ -134,62 +164,67 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	// Allocate memory for new park and initialize its fields
 	vehicle *new_vehicle = malloc(sizeof(vehicle));
 
+	// Calculate the load factor
+	float load_factor = (float)vehicles->vehicle_num / vehicles->size;
+
+	// If the load factor is greater than a certain threshold (e.g., 0.75),
+	// resize the hashmap
+	if (load_factor > 0.75) {
+		resize_vehicle_index(vehicles, vehicles->size * 2);
+	}
+
+	// Compute the hash of the vehicle's license plate
+	unsigned long hash = vehicle_hash(license_plate, vehicles->size);
+
 	memcpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
-	new_vehicle->hashed_plate = hash(license_plate);
+	new_vehicle->hashed_plate = hash;
 	new_vehicle->registries = NULL;
 	new_vehicle->last_reg = NULL;
-	new_vehicle->next = NULL;
 
-	// Add new park to the end of the linked list
-	if (vehicles->vehicle_num == 0) {
-		vehicles->first = new_vehicle;
-		vehicles->last = new_vehicle;
-	} else {
-		vehicles->last->next = new_vehicle;
-		vehicles->last = new_vehicle;
-	}
+	// Add the vehicle to the appropriate bucket
+	new_vehicle->next = vehicles->buckets[hash];
+	vehicles->buckets[hash] = new_vehicle;
 
 	vehicles->vehicle_num++;
 	return new_vehicle;
 }
 
-void remove_vehicle(vehicle_index *vehicles) {
-	vehicle *vehicle_del = vehicles->first;
-	// If the vehicle is NULL, there's nothing to remove
-	if (vehicle_del == NULL) return;
+void remove_all_vehicles(vehicle_index *vehicles) {
+	for (int i = 0; i < vehicles->size; i++) {
+		vehicle *current_vehicle = vehicles->buckets[i];
+		while (current_vehicle != NULL) {
+			vehicle *next_vehicle = current_vehicle->next;
 
-	if (vehicles->first->registries != NULL) {
-		clean_vehicle_registries(vehicles->first->registries);
+			// If the vehicle has registries, clean them
+			if (current_vehicle->registries != NULL) {
+				clean_vehicle_registries(current_vehicle->registries);
+			}
+
+			// Free the memory for the vehicle's registry and the vehicle
+			// itself
+			free(current_vehicle);
+			vehicles->vehicle_num--;
+
+			current_vehicle = next_vehicle;
+		}
+		vehicles->buckets[i] = NULL;
 	}
-
-	// Clean the indexes
-	if (vehicle_del->next == NULL) {
-		vehicles->last = NULL;
-	}
-	vehicles->first = vehicles->first->next;
-
-	// Free the memory for the vehicle's registry and the vehicle itself
-	free(vehicle_del);
-	vehicles->vehicle_num--;
 }
 
-vehicle *find_vehicle(
-	char *license_plate, unsigned long license_plate_hash,
-	vehicle_index *vehicles
-) {
-	int i;
-	vehicle *current = vehicles->first;
-	for (i = 0; i < vehicles->vehicle_num; i++) {
-		if (license_plate_hash == current->hashed_plate) {
-			if (strcmp(license_plate, current->license_plate) == 0)
-				return current;
+vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles) {
+	unsigned long license_plate_hash =
+		vehicle_hash(license_plate, vehicles->size);
+	vehicle *current_vehicle = vehicles->buckets[license_plate_hash];
+
+	while (current_vehicle != NULL) {
+		if (strcmp(current_vehicle->license_plate, license_plate) == 0) {
+			return current_vehicle;
 		}
-		current = current->next;
+		current_vehicle = current_vehicle->next;
 	}
 
 	return NULL;
 }
-
 void register_entrance(
 	char *license_plate, vehicle_index *vehicles, park *parking,
 	date *timestamp, vehicle *reg_vehicle

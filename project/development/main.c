@@ -15,8 +15,8 @@
  * @brief  Main function that starts the application
  *
  * @return SUCCESSFUL if the program executes without errors,
- * UNEXPECTED if an unexpected error occurs, and UNEXPECTED_INPUT if the program
- * receives an input that it doesn't know how to handle.
+ * UNEXPECTED if an unexpected error occurs, and UNEXPECTED_INPUT if the
+ * program receives an input that it doesn't know how to handle.
  *
  */
 int main() { return menu(); }

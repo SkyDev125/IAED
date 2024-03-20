@@ -6,6 +6,8 @@
         "typeinfo": "c",
         "compare": "c",
         "type_traits": "c",
-        "headers.h": "c"
+        "headers.h": "c",
+        "string.h": "c",
+        "menu.h": "c"
     }
 }

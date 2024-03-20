@@ -78,12 +78,13 @@ typedef struct vehicle_struct {
 	unsigned long hashed_plate;
 	registry *registries;
 	registry *last_reg;
-	struct vehicle_struct *next;
+	vehicle *next;
 } vehicle;
 
 /// Structure to represent an index of vehicles.
 typedef struct {
-	vehicle *first, *last;
+	vehicle **buckets;
+	int size;
 	int vehicle_num;
 } vehicle_index;
 
@@ -111,21 +112,22 @@ park *find_park(char *name, unsigned long park_hash, park_index *parks);
 /// Hashes a string.
 unsigned long hash(char *str);
 
+unsigned long vehicle_hash(char *license_plate, int hash_size);
+
+void resize_vehicle_index(vehicle_index *index, int new_size);
+
 /// @defgroup vehicle_operations Vehicle operations
 /// @{
 
 vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles);
 
-void remove_vehicle(vehicle_index *vehicles);
+void remove_all_vehicles(vehicle_index *vehicles);
 
 void clean_park_registries(registry *reg);
 
 void clean_vehicle_registries(registry *reg);
 
-vehicle *find_vehicle(
-	char *license_plate, unsigned long license_plate_hash,
-	vehicle_index *vehicles
-);
+vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles);
 
 void register_entrance(
 	char *license_plate, vehicle_index *vehicles, park *park_enter,

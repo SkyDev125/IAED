@@ -73,7 +73,7 @@ int run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 	args = parse_time(args, &timestamp);
 	timestamp.total_mins = date_to_minutes(&timestamp);
 	parking = find_park(name, hash(name), parks);
-	temp_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
+	temp_vehicle = find_vehicle(license_plate, vehicles);
 
 	// Error checking
 	run_e_errochecking(
@@ -132,7 +132,7 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 
 	// Get the necessary arguments
 	run_s_args(&args, &name, license_plate, &timestamp, &parking, parks);
-	temp_vehicle = find_vehicle(license_plate, hash(license_plate), vehicles);
+	temp_vehicle = find_vehicle(license_plate, vehicles);
 
 	// Error checking
 	run_s_errochecking(
@@ -196,11 +196,10 @@ void run_s_errochecking(
 		return;
 	}
 
-	if (last_vehicle_registry == NULL || last_vehicle_registry->type != ENTER) {
+	if (last_vehicle_registry == NULL || last_vehicle_registry->type != ENTER)
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	} else if (last_vehicle_registry->registration->enter.park_ptr != parking) {
+	else if (last_vehicle_registry->registration->enter.park_ptr != parking)
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	}
 
 	verify_date_registry(parking->last_reg, err, timestamp);
 }
