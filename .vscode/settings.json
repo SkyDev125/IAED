@@ -8,6 +8,8 @@
         "type_traits": "c",
         "headers.h": "c",
         "string.h": "c",
-        "menu.h": "c"
+        "menu.h": "c",
+        "linked_list.h": "c",
+        "commands.h": "c"
     }
 }

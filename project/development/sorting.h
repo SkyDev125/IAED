@@ -8,3 +8,16 @@
  * @copyright Copyright (c) 2024
  *
  */
+
+#ifndef SORTING
+#define SORTING
+
+#include "headers.h"
+
+void merge(registry **regs, int low, int mid, int high);
+
+void merge_sort(registry **regs, int low, int high);
+
+int compare_regs_park(registry *a, registry *b);
+
+#endif

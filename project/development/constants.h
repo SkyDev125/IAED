@@ -18,8 +18,9 @@
 /// Buffer size for reading input from the command line
 #define MAX_LINE_BUFF 8192
 
-/// Size of chunk to allocate for a string when reading from the buffer
-#define STRING_CHUNKS 100
+#define DEFAULT_CHUNK_SIZE 100
+
+#define HASH_SIZE 100
 
 /// @}
 
@@ -118,8 +119,6 @@ enum commands {
 
 /// False value for comparisons
 #define FALSE 0
-
-#define HASH_SIZE 100
 
 /// Alias for boolean
 typedef char bool;

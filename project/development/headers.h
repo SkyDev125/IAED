@@ -19,9 +19,10 @@
 
 #include "constants.h"
 #include "linked_list.h"
+#include "parsing.h"
+#include "sorting.h"
 #include "commands.h"
 #include "mem_manage.h"
 #include "menu.h"
-#include "parsing.h"
 
 #endif

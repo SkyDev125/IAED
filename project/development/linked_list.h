@@ -116,6 +116,10 @@ unsigned long vehicle_hash(char *license_plate, int hash_size);
 
 void resize_vehicle_index(vehicle_index *index, int new_size);
 
+void print_registry(registry *reg);
+int get_non_null_registries(registry *first_reg, registry ***destination);
+void show_all_regs(registry **regs, registry *last_reg, int *size);
+
 /// @defgroup vehicle_operations Vehicle operations
 /// @{
 

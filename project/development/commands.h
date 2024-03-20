@@ -46,7 +46,7 @@ void run_s_errochecking(
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information
-int run_v(char *args, park_index *parks, vehicle_index *vehicles);
+int run_v(char *args, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing
 /// of a parking lot

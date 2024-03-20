@@ -39,13 +39,14 @@ unsigned long vehicle_hash(char *license_plate, int hash_size) {
 }
 
 void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
-	vehicle **new_buckets = calloc(new_size, sizeof(vehicle *));
+	vehicle **new_buckets = calloc(new_size, sizeof(vehicle *)),
+			*current_vehicle, *next_vehicle;
+	unsigned long new_hash;
 	for (int i = 0; i < vehicles->size; i++) {
-		vehicle *current_vehicle = vehicles->buckets[i];
+		current_vehicle = vehicles->buckets[i];
 		while (current_vehicle != NULL) {
-			vehicle *next_vehicle = current_vehicle->next;
-			unsigned long new_hash =
-				vehicle_hash(current_vehicle->license_plate, new_size);
+			next_vehicle = current_vehicle->next;
+			new_hash = vehicle_hash(current_vehicle->license_plate, new_size);
 			// Add the vehicle to the front of the list in the new bucket
 			current_vehicle->next = new_buckets[new_hash];
 			new_buckets[new_hash] = current_vehicle;
@@ -163,9 +164,11 @@ park *find_park(char *name, unsigned long name_hash, park_index *parks) {
 vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	// Allocate memory for new park and initialize its fields
 	vehicle *new_vehicle = malloc(sizeof(vehicle));
+	unsigned long hash;
+	float load_factor;
 
 	// Calculate the load factor
-	float load_factor = (float)vehicles->vehicle_num / vehicles->size;
+	load_factor = (float)vehicles->vehicle_num / vehicles->size;
 
 	// If the load factor is greater than a certain threshold (e.g., 0.75),
 	// resize the hashmap
@@ -174,7 +177,7 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	}
 
 	// Compute the hash of the vehicle's license plate
-	unsigned long hash = vehicle_hash(license_plate, vehicles->size);
+	hash = vehicle_hash(license_plate, vehicles->size);
 
 	memcpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
 	new_vehicle->hashed_plate = hash;
@@ -191,9 +194,9 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 
 void remove_all_vehicles(vehicle_index *vehicles) {
 	for (int i = 0; i < vehicles->size; i++) {
-		vehicle *current_vehicle = vehicles->buckets[i];
+		vehicle *current_vehicle = vehicles->buckets[i], *next_vehicle;
 		while (current_vehicle != NULL) {
-			vehicle *next_vehicle = current_vehicle->next;
+			next_vehicle = current_vehicle->next;
 
 			// If the vehicle has registries, clean them
 			if (current_vehicle->registries != NULL) {
@@ -289,7 +292,7 @@ void clean_park_registries(registry *reg) {
 
 	if ((*reg).type == ENTER) {
 		(*reg).registration->enter.park_ptr = NULL;
-	} else if ((*reg).type == EXIT) {
+	} else {
 		(*reg).registration->exit.park_ptr = NULL;
 	}
 
@@ -298,7 +301,7 @@ void clean_park_registries(registry *reg) {
 
 		if ((*reg).next->type == ENTER) {
 			(*reg).next->registration->enter.park_ptr = NULL;
-		} else if ((*reg).next->type == EXIT) {
+		} else {
 			(*reg).next->registration->exit.park_ptr = NULL;
 		}
 
@@ -321,4 +324,72 @@ void clean_vehicle_registries(registry *reg) {
 		next_reg = temp_reg;
 	}
 	free(reg);
+}
+
+void show_all_regs(registry **regs, registry *last_reg, int *size) {
+	date *timestamp;
+	int i;
+
+	if (last_reg->type == EXIT) {
+		for (i = 0; i < *size; i++) {
+			print_registry(regs[i]);
+		}
+	} else {
+		for (i = 0; i < *size; i++) {
+			if (regs[i] == last_reg) {
+				timestamp = &(regs[i]->registration->enter.timestamp);
+				printf(
+					"%s %02d-%02d-%04d %02d:%02d\n",
+					last_reg->registration->enter.park_ptr->name,
+					timestamp->days, timestamp->months, timestamp->years,
+					timestamp->hours, timestamp->minutes
+				);
+			} else
+				print_registry(regs[i]);
+		}
+	}
+}
+
+void print_registry(registry *reg) {
+	date *timestamp;
+
+	// parque1 01-01-2024 08:00 01-01-2024 08:10
+	if (reg->type == ENTER) {
+		timestamp = &(reg->registration->enter.timestamp);
+		printf(
+			"%s %02d-%02d-%04d %02d:%02d",
+			reg->registration->enter.park_ptr->name, timestamp->days,
+			timestamp->months, timestamp->years, timestamp->hours,
+			timestamp->minutes
+		);
+	} else {
+		timestamp = &(reg->registration->exit.timestamp);
+		printf(
+			" %02d-%02d-%04d %02d:%02d\n", timestamp->days, timestamp->months,
+			timestamp->years, timestamp->hours, timestamp->minutes
+		);
+	}
+}
+
+int get_non_null_registries(registry *first_reg, registry ***destination) {
+	int count = 0;
+	registry *current = first_reg;
+	while (current != NULL) {
+		if ((current->type == ENTER &&
+			 current->registration->enter.park_ptr != NULL) ||
+			(current->type == EXIT &&
+			 current->registration->exit.park_ptr != NULL)) {
+			// Resize array in chunks
+			if (count % DEFAULT_CHUNK_SIZE == 0) {
+				*destination = realloc(
+					*destination,
+					(count + DEFAULT_CHUNK_SIZE) * sizeof(registry *)
+				);
+			}
+			(*destination)[count] = current;
+			count++;
+		}
+		current = current->next;
+	}
+	return count;
 }

@@ -204,27 +204,41 @@ void run_s_errochecking(
 	verify_date_registry(parking->last_reg, err, timestamp);
 }
 
-// int run_v(char *args, park_index *parks, vehicle_index *vehicles) {
-// 	char license_plate[9], err[MAX_LINE_BUFF] = {};
-// 	strncpy(license_plate, args, LICENSE_PLATE_SIZE);
-// 	license_plate[LICENSE_PLATE_SIZE] = '\0';
+int run_v(char *args, vehicle_index *vehicles) {
+	char license_plate[9], err[MAX_LINE_BUFF] = {};
+	license_plate[LICENSE_PLATE_SIZE] = '\0';
+	vehicle *temp_vehicle;
+	registry **non_null_regs = malloc(sizeof(registry *) * DEFAULT_CHUNK_SIZE);
+	int count = 0;
 
-// 	if (is_licence_plate(license_plate)) {
-// 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
-// 	}
+	parse_license_plate(args, license_plate);
+	temp_vehicle = find_vehicle(license_plate, vehicles);
 
-// 	if (err[0] != '\0') {
-// 		printf("%s", err);
-// 		return UNEXPECTED_INPUT;
-// 	}
-// 	// TODO: Check if the license plate exists
+	if (!is_licence_plate(license_plate)) {
+		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	} else if (temp_vehicle == NULL) {
+		sprintf(err, "%s: no entries found in any parking.\n", license_plate);
+	} else {
+		count =
+			get_non_null_registries(temp_vehicle->registries, &non_null_regs);
+		if (count == 0)
+			sprintf(
+				err, "%s: no entries found in any parking.\n", license_plate
+			);
+	}
 
-// 	// TODO: List all entries/exits, order by park name, and then by Date
-// and
-// 	// Hour.
+	if (err[0] != '\0') {
+		printf("%s", err);
+		free(non_null_regs);
+		return UNEXPECTED_INPUT;
+	}
 
-// 	return SUCCESSFUL;
-// }
+	merge_sort(non_null_regs, 0, count - 1);
+	show_all_regs(non_null_regs, temp_vehicle->last_reg, &count);
+
+	free(non_null_regs);
+	return SUCCESSFUL;
+}
 
 // int run_f(char *args, park_index *parks, vehicle_index *vehicles) {
 // 	int name_size = str_size(&args), read_num;
