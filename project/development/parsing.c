@@ -165,3 +165,10 @@ float calculate_cost(date *start, date *end, park *parking) {
 
 	return cost;
 }
+
+bool is_same_day(date *d1, date *d2) {
+	if ((d1->days == d2->days) && (d1->months == d2->months) &&
+		(d1->years == d2->years))
+		return TRUE;
+	return FALSE;
+}

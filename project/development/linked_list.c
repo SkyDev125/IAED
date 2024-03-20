@@ -393,3 +393,78 @@ int get_non_null_registries(registry *first_reg, registry ***destination) {
 	}
 	return count;
 }
+
+registry *find_reg(registry *reg, char type) {
+	registry *current_reg = reg;
+	while (current_reg != NULL) {
+		if (current_reg->type == type) {
+			return current_reg;
+		}
+		current_reg = current_reg->next;
+	}
+	return NULL;
+}
+
+void show_billing(park *parking) {
+	registry *current_reg;
+	date *old_date, *current_date;
+	float total_cost = 0;
+
+	current_reg = find_reg(parking->registries, EXIT);
+	old_date = &(current_reg->registration->exit.timestamp);
+
+	while (current_reg != NULL) {
+		if (current_reg->type == EXIT) {
+			current_date = &(current_reg->registration->exit.timestamp);
+			if (is_same_day(old_date, current_date)) {
+				total_cost += current_reg->registration->exit.cost;
+			} else {
+				printf(
+					"%02d-%02d-%04d %.2f\n", old_date->days, old_date->months,
+					old_date->years, total_cost
+				);
+				total_cost = current_reg->registration->exit.cost;
+				old_date = current_date;
+			}
+		}
+		current_reg = current_reg->next;
+	}
+
+	printf(
+		"%02d-%02d-%04d %.2f\n", old_date->days, old_date->months,
+		old_date->years, total_cost
+	);
+}
+
+void show_billing_day(park *parking, date *day) {
+	registry *current_reg = parking->registries;
+	registry_exit *current_exit;
+	date *temp_date;
+
+	while (current_reg != NULL) {
+		if (current_reg->type == EXIT) {
+			temp_date = &(current_reg->registration->enter.timestamp);
+			if (is_same_day(day, temp_date)) break;
+		}
+		current_reg = current_reg->next;
+	}
+
+	while (current_reg != NULL) {
+		if (current_reg->type == EXIT) {
+			temp_date = &(current_reg->registration->enter.timestamp);
+
+			if (is_same_day(day, temp_date)) {
+				current_exit = &(current_reg->registration->exit);
+				printf(
+					"%s %02d:%02d %.2f\n",
+					current_exit->vehicle_ptr->license_plate,
+					current_exit->timestamp.hours,
+					current_exit->timestamp.minutes, current_exit->cost
+				);
+			} else {
+				break;
+			}
+		}
+		current_reg = current_reg->next;
+	}
+}

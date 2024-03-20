@@ -119,6 +119,9 @@ void resize_vehicle_index(vehicle_index *index, int new_size);
 void print_registry(registry *reg);
 int get_non_null_registries(registry *first_reg, registry ***destination);
 void show_all_regs(registry **regs, registry *last_reg, int *size);
+void show_billing_day(park *parking, date *day);
+void show_billing(park *parking);
+registry *find_reg(registry *reg, char type);
 
 /// @defgroup vehicle_operations Vehicle operations
 /// @{

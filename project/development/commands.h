@@ -50,7 +50,7 @@ int run_v(char *args, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing
 /// of a parking lot
-int run_f(char *args, park_index *parks, vehicle_index *vehicles);
+int run_f(char *args, park_index *parks);
 
 /// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
 /// lot from the system

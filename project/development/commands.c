@@ -146,8 +146,9 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 	}
 
 	start_timestamp = temp_vehicle->last_reg->registration->enter.timestamp;
-	register_exit(parking, &timestamp, temp_vehicle, &cost);
 	cost = calculate_cost(&start_timestamp, &timestamp, parking);
+	register_exit(parking, &timestamp, temp_vehicle, &cost);
+
 
 	printf(
 		"%s %02d-%02d-%04d %02d:%02d %02d-%02d-%04d %02d:%02d %.2f\n",
@@ -240,33 +241,30 @@ int run_v(char *args, vehicle_index *vehicles) {
 	return SUCCESSFUL;
 }
 
-// int run_f(char *args, park_index *parks, vehicle_index *vehicles) {
-// 	int name_size = str_size(&args), read_num;
-// 	char *name = parse_string(args, &args, &name_size), err[MAX_LINE_BUFF] =
-// {}; 	date timestamp; 	park *parking;
+int run_f(char *args, park_index *parks) {
+	int name_size = str_size(&args);
+	char *name;
+	date timestamp;
+	park *parking;
 
-// 	read_num = sscanf(
-// 		args, "%2d-%2d-%4d", &timestamp.days, &timestamp.months,
-// 		&timestamp.years
-// 	);
+	name = parse_string(args, &args, &name_size);
+	parking = find_park(name, hash(name), parks);
 
-// 	if ((parking = find_park(name, hash(name), parks)) == NULL) {
-// 		sprintf(err, "%s: no such parking.\n", name);
-// 	}
+	if (parking == NULL) {
+		printf("%s: no such parking.\n", name);
+		return UNEXPECTED_INPUT;
+	}
 
-// 	if (err[0] != '\0') {
-// 		printf("%s", err);
-// 		return UNEXPECTED_INPUT;
-// 	}
+	if (*args == '\0') {
+		show_billing(parking);
+		return SUCCESSFUL;
+	}
 
-// 	if (read_num != 3) {
-// 		// TODO: Order by date
-// 	} else {
-// 		// TODO: Order by hour in date
-// 	}
+	args = parse_date(args, &timestamp);
+	show_billing_day(parking, &timestamp);
 
-// 	return SUCCESSFUL;
-// }
+	return SUCCESSFUL;
+}
 
 int run_r(char *args, park_index *parks) {
 	int name_size = str_size(&args);

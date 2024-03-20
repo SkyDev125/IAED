@@ -51,4 +51,6 @@ bool is_valid_date(date *d);
 
 float calculate_cost(date *start, date *end, park *parking);
 
+bool is_same_day(date *d1, date *d2);
+
 #endif
