@@ -58,7 +58,8 @@ error_codes run_p(char *args, park_index *parks) {
 	return SUCCESSFUL;
 }
 
-error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles) {
+error_codes
+run_e(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate) {
 	int name_size;
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
 	date timestamp;
@@ -77,14 +78,15 @@ error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 
 	// Error checking
 	run_e_errochecking(
-		parking, name, err, license_plate, &timestamp, temp_vehicle
+		parking, name, err, license_plate, &timestamp, temp_vehicle, sysdate
 	);
+
 	if (err[0] != '\0') {
 		printf("%s", err);
 		free(name);
 		return UNEXPECTED_INPUT;
 	}
-
+	*sysdate = timestamp;
 	register_entrance(
 		license_plate, vehicles, parking, &timestamp, temp_vehicle
 	);
@@ -96,7 +98,7 @@ error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 
 void run_e_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle
+	vehicle *temp_vehicle, date *sysdate
 ) {
 	registry *last_vehicle_registry;
 
@@ -109,8 +111,6 @@ void run_e_errochecking(
 	} else if (!is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
 		return;
-	} else if (!is_valid_date(timestamp)) {
-		sprintf(err, "invalid date.\n");
 	}
 
 	if (temp_vehicle != NULL) {
@@ -122,10 +122,11 @@ void run_e_errochecking(
 		}
 	}
 
-	verify_date_registry(parking->last_reg, err, timestamp);
+	verify_date_registry(sysdate, err, timestamp);
 }
 
-error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles) {
+error_codes
+run_s(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate) {
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
 	date timestamp, start_timestamp;
 	park *parking;
@@ -138,7 +139,7 @@ error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 
 	// Error checking
 	run_s_errochecking(
-		parking, name, err, license_plate, &timestamp, temp_vehicle
+		parking, name, err, license_plate, &timestamp, temp_vehicle, sysdate
 	);
 
 	if (err[0] != '\0') {
@@ -149,6 +150,7 @@ error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 
 	start_timestamp = temp_vehicle->last_reg->registration->enter.timestamp;
 	cost = calculate_cost(&start_timestamp, &timestamp, parking);
+	*sysdate = timestamp;
 	register_exit(parking, &timestamp, temp_vehicle, &cost);
 
 	printf(
@@ -179,7 +181,7 @@ void run_s_args(
 
 void run_s_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle
+	vehicle *temp_vehicle, date *sysdate
 ) {
 	registry *last_vehicle_registry;
 
@@ -189,8 +191,6 @@ void run_s_errochecking(
 	} else if (!is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
 		return;
-	} else if (!is_valid_date(timestamp)) {
-		sprintf(err, "invalid date.\n");
 	}
 
 	if (temp_vehicle != NULL) {
@@ -200,12 +200,14 @@ void run_s_errochecking(
 		return;
 	}
 
-	if (last_vehicle_registry == NULL || last_vehicle_registry->type != ENTER)
+	if (last_vehicle_registry == NULL ||
+		last_vehicle_registry->type != ENTER) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	else if (last_vehicle_registry->registration->enter.park_ptr != parking)
+	} else if (last_vehicle_registry->registration->enter.park_ptr != parking) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-
-	verify_date_registry(parking->last_reg, err, timestamp);
+	} else {
+		verify_date_registry(sysdate, err, timestamp);
+	}
 }
 
 error_codes run_v(char *args, vehicle_index *vehicles) {
@@ -303,15 +305,9 @@ error_codes run_r(char *args, park_index *parks) {
 	return SUCCESSFUL;
 }
 
-void verify_date_registry(registry *last_reg, char *err, date *timestamp) {
-	if (last_reg != NULL) {
-		if ((last_reg->type == ENTER &&
-			 last_reg->registration->enter.timestamp.total_mins >
-				 timestamp->total_mins) ||
-			(last_reg->type == EXIT &&
-			 last_reg->registration->exit.timestamp.total_mins >
-				 timestamp->total_mins)) {
-			sprintf(err, "invalid date.\n");
-		}
+void verify_date_registry(date *sysdate, char *err, date *timestamp) {
+	if (!is_valid_date(timestamp) ||
+		sysdate->total_mins > timestamp->total_mins) {
+		sprintf(err, "invalid date.\n");
 	}
 }

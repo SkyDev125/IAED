@@ -23,16 +23,18 @@ error_codes run_p(char *args, park_index *parks);
 
 /// Function to run the COMMAND_ADD_VEHICLE command, which registers the entry
 /// of a vehicle
-error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles);
+error_codes
+run_e(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate);
 
 void run_e_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle
-);
+	vehicle *temp_vehicle, date *sysdate
+) ;
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
 /// exit of a vehicle
-error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles);
+error_codes
+run_s(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate);
 
 void run_s_args(
 	char **args, char **name, char *license_plate, date *timestamp,
@@ -41,7 +43,7 @@ void run_s_args(
 
 void run_s_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle
+	vehicle *temp_vehicle, date *sysdate
 );
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
@@ -58,6 +60,6 @@ error_codes run_r(char *args, park_index *parks);
 
 /// @}
 
-void verify_date_registry(registry *last_reg, char *err, date *timestamp);
+void verify_date_registry(date *sysdate, char *err, date *timestamp);
 
 #endif

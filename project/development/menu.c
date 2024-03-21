@@ -23,6 +23,7 @@ error_codes menu() {
 	park_index parks = {NULL, NULL, 0};
 	vehicle_index vehicles = {
 		calloc(HASH_SIZE, sizeof(vehicle *)), HASH_SIZE, 0};
+	date sysdate = {0, 0, 0, 0, 0, 0};
 
 	// Main menu loop
 	while (TRUE) {
@@ -32,7 +33,7 @@ error_codes menu() {
 		}
 
 		command = remove_whitespaces(buffer);
-		if (run_command(command, &parks, &vehicles) == SUCCESSFUL_EXIT) break;
+		if (run_command(command, &parks, &vehicles, &sysdate) == SUCCESSFUL_EXIT) break;
 	}
 
 	free_all(&parks, &vehicles);
@@ -50,8 +51,9 @@ error_codes menu() {
  * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT
  * if the 'q' command is received.
  */
-error_codes
-run_command(char *command, park_index *parks, vehicle_index *vehicles) {
+error_codes run_command(
+	char *command, park_index *parks, vehicle_index *vehicles, date *sysdate
+) {
 	// Point to args
 	char *args = command;
 	args = remove_whitespaces(++args);
@@ -62,9 +64,9 @@ run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 	case CREATE_OR_VIEW:
 		return run_p(args, parks);
 	case ADD_VEHICLE:
-		return run_e(args, parks, vehicles);
+		return run_e(args, parks, vehicles, sysdate);
 	case REMOVE_VEHICLE:
-		return run_s(args, parks, vehicles);
+		return run_s(args, parks, vehicles, sysdate);
 	case VIEW_VEHICLE:
 		return run_v(args, vehicles);
 	case PARK_BILLING:

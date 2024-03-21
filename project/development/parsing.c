@@ -105,9 +105,9 @@ bool is_licence_plate(char *str) {
 long int date_to_minutes(date *d) {
 	long int minutes;
 
-	minutes = d->years * DAYS_IN_YEAR * MINS_PER_DAY;
+	minutes = (long int)d->years * DAYS_IN_YEAR * MINS_PER_DAY;
 
-	for (int i = 0; i < d->months - 1; i++) {
+	for (int i = 0; i < (d->months - 1); i++) {
 		minutes += days_in_month[i] * MINS_PER_DAY;
 	}
 
