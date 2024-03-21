@@ -80,3 +80,56 @@ int compare_regs_park(registry *a, registry *b) {
 	// Compare park names
 	return strcmp(a_park_name, b_park_name);
 }
+
+void merge_names(char **names, int low, int mid, int high) {
+	int i, j, k, n1 = mid - low + 1, n2 = high - mid;
+	char **L = malloc(n1 * sizeof(char *));
+	char **R = malloc(n2 * sizeof(char *));
+
+	// Copy data to temp arrays L[] and R[]
+	for (i = 0; i < n1; i++)
+		L[i] = names[low + i];
+	for (j = 0; j < n2; j++)
+		R[j] = names[mid + 1 + j];
+
+	// Merge the temp arrays back into regs[low..high]
+	i = 0, j = 0, k = low;
+	while (i < n1 && j < n2) {
+		if (strcmp(L[i], R[j]) <= 0) {
+			names[k] = L[i];
+			i++;
+		} else {
+			names[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+
+	// Copy the remaining elements of L[], if there are any
+	while (i < n1) {
+		names[k] = L[i];
+		i++, k++;
+	}
+
+	// Copy the remaining elements of R[], if there are any
+	while (j < n2) {
+		names[k] = R[j];
+		j++, k++;
+	}
+
+	// Free memory
+	free(L), free(R);
+}
+
+void merge_sort_names(char **names, int low, int high) {
+	if (low < high) {
+		// Same as (low+high)/2, but avoids overflow for large low and high
+		int mid = low + (high - low) / 2;
+
+		// Sort first and second halves
+		merge_sort_names(names, low, mid);
+		merge_sort_names(names, mid + 1, high);
+
+		merge_names(names, low, mid, high);
+	}
+}

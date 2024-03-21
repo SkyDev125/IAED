@@ -149,7 +149,6 @@ int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 	cost = calculate_cost(&start_timestamp, &timestamp, parking);
 	register_exit(parking, &timestamp, temp_vehicle, &cost);
 
-
 	printf(
 		"%s %02d-%02d-%04d %02d:%02d %02d-%02d-%04d %02d:%02d %.2f\n",
 		license_plate, start_timestamp.days, start_timestamp.months,
@@ -242,47 +241,61 @@ int run_v(char *args, vehicle_index *vehicles) {
 }
 
 int run_f(char *args, park_index *parks) {
-	int name_size = str_size(&args);
 	char *name;
 	date timestamp;
 	park *parking;
+	int name_size = str_size(&args);
 
 	name = parse_string(args, &args, &name_size);
 	parking = find_park(name, hash(name), parks);
+	args = remove_whitespaces(args);
 
-	if (parking == NULL) {
-		printf("%s: no such parking.\n", name);
-		return UNEXPECTED_INPUT;
-	}
-
-	if (*args == '\0') {
-		show_billing(parking);
-		return SUCCESSFUL;
-	}
-
-	args = parse_date(args, &timestamp);
-	show_billing_day(parking, &timestamp);
-
-	return SUCCESSFUL;
-}
-
-int run_r(char *args, park_index *parks) {
-	int name_size = str_size(&args);
-	char *name = parse_string(args, &args, &name_size);
-	park *parking;
-
-	parking = find_park(name, hash(name), parks);
 	if (parking == NULL) {
 		printf("%s: no such parking.\n", name);
 		free(name);
 		return UNEXPECTED_INPUT;
 	}
 
-	remove_park(parking, parks);
+	if (*args == '\0') {
+		show_billing(parking);
+		free(name);
+		return SUCCESSFUL;
+	}
 
-	// TODO: PRINT PARKS IN ALPHABETICAL ORDER
+	args = parse_date(args, &timestamp);
+	show_billing_day(parking, &timestamp);
 
 	free(name);
+	return SUCCESSFUL;
+}
+
+int run_r(char *args, park_index *parks) {
+	int name_size, count, i;
+	char *name, **names = malloc(sizeof(char *) * DEFAULT_CHUNK_SIZE);
+	park *parking;
+
+	name_size = str_size(&args);
+	name = parse_string(args, &args, &name_size);
+	parking = find_park(name, hash(name), parks);
+
+	if (parking == NULL) {
+		printf("%s: no such parking.\n", name);
+		free(name);
+		free(names);
+		return UNEXPECTED_INPUT;
+	}
+
+	remove_park(parking, parks);
+
+	count = get_park_names(parks, &names);
+	merge_sort_names(names, 0, count - 1);
+
+	for (i = 0; i < count; i++) {
+		printf("%s\n", names[i]);
+	}
+
+	free(name);
+	free(names);
 	return SUCCESSFUL;
 }
 

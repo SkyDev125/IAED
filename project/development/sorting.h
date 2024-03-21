@@ -20,4 +20,8 @@ void merge_sort(registry **regs, int low, int high);
 
 int compare_regs_park(registry *a, registry *b);
 
+void merge_names(char **names, int low, int mid, int high);
+
+void merge_sort_names(char **names, int low, int high);
+
 #endif

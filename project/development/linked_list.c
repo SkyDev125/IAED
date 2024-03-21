@@ -268,7 +268,8 @@ void register_exit(
 }
 
 void add_entry(
-	registry **reg, registry **last_reg, registry_union *entry, char type
+	registry **reg, registry **last_reg, registry_union *entry,
+	registry_types type
 ) {
 	registry *temp_reg, *new_reg;
 
@@ -394,7 +395,7 @@ int get_non_null_registries(registry *first_reg, registry ***destination) {
 	return count;
 }
 
-registry *find_reg(registry *reg, char type) {
+registry *find_reg(registry *reg, registry_types type) {
 	registry *current_reg = reg;
 	while (current_reg != NULL) {
 		if (current_reg->type == type) {
@@ -467,4 +468,20 @@ void show_billing_day(park *parking, date *day) {
 		}
 		current_reg = current_reg->next;
 	}
+}
+
+int get_park_names(park_index *parks, char ***park_names) {
+	park *current = parks->first;
+	int count = 0;
+	while (current != NULL) {
+		if (count % 10 == DEFAULT_CHUNK_SIZE) {
+			*park_names = realloc(
+				*park_names, (count + DEFAULT_CHUNK_SIZE) * sizeof(char *)
+			);
+		}
+		(*park_names)[count] = current->name;
+		count++;
+		current = current->next;
+	}
+	return count;
 }
