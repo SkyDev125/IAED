@@ -61,14 +61,14 @@ char *parse_date(char *str, date *timestamp) {
 		&(timestamp->years)
 	);
 
-	return str + DATE_MAX_SIZE;
+	return str + DATE_READ_SIZE;
 }
 
 char *parse_time(char *str, date *timestamp) {
 	str = remove_whitespaces(str);
 	sscanf(str, "%2d:%2d", &(timestamp->hours), &(timestamp->minutes));
 
-	return str + HOUR_MAX_SIZE;
+	return str + HOUR_READ_SIZE;
 }
 
 int str_size(char **args) {

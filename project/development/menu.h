@@ -13,9 +13,10 @@
 #define MENU
 
 /// Displays the main menu and handles user input.
-int menu();
+error_codes menu();
 
 /// Executes the command specified by the user.
-int run_command(char *command, park_index *parks, vehicle_index *vehicles);
+error_codes
+run_command(char *command, park_index *parks, vehicle_index *vehicles);
 
 #endif

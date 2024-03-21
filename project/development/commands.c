@@ -19,7 +19,7 @@
  * @return SUCCESSFUL if the command is executed successfully,
  * UNEXPECTED if an error occurs.
  */
-int run_p(char *args, park_index *parks) {
+error_codes run_p(char *args, park_index *parks) {
 	char *name, err[MAX_LINE_BUFF] = {};
 	int name_size, capacity;
 	float first_value, value, day_value;
@@ -58,7 +58,7 @@ int run_p(char *args, park_index *parks) {
 	return SUCCESSFUL;
 }
 
-int run_e(char *args, park_index *parks, vehicle_index *vehicles) {
+error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles) {
 	int name_size;
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
 	date timestamp;
@@ -123,7 +123,7 @@ void run_e_errochecking(
 	verify_date_registry(parking->last_reg, err, timestamp);
 }
 
-int run_s(char *args, park_index *parks, vehicle_index *vehicles) {
+error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles) {
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
 	date timestamp, start_timestamp;
 	park *parking;
@@ -204,11 +204,11 @@ void run_s_errochecking(
 	verify_date_registry(parking->last_reg, err, timestamp);
 }
 
-int run_v(char *args, vehicle_index *vehicles) {
+error_codes run_v(char *args, vehicle_index *vehicles) {
 	char license_plate[9], err[MAX_LINE_BUFF] = {};
 	license_plate[LICENSE_PLATE_SIZE] = '\0';
 	vehicle *temp_vehicle;
-	registry **non_null_regs = malloc(sizeof(registry *) * DEFAULT_CHUNK_SIZE);
+	registry **non_null_regs = malloc(sizeof(registry *) * CHUNK_SIZE);
 	int count = 0;
 
 	parse_license_plate(args, license_plate);
@@ -240,7 +240,7 @@ int run_v(char *args, vehicle_index *vehicles) {
 	return SUCCESSFUL;
 }
 
-int run_f(char *args, park_index *parks) {
+error_codes run_f(char *args, park_index *parks) {
 	char *name;
 	date timestamp;
 	park *parking;
@@ -269,9 +269,9 @@ int run_f(char *args, park_index *parks) {
 	return SUCCESSFUL;
 }
 
-int run_r(char *args, park_index *parks) {
+error_codes run_r(char *args, park_index *parks) {
 	int name_size, count, i;
-	char *name, **names = malloc(sizeof(char *) * DEFAULT_CHUNK_SIZE);
+	char *name, **names = malloc(sizeof(char *) * CHUNK_SIZE);
 	park *parking;
 
 	name_size = str_size(&args);

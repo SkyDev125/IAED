@@ -18,7 +18,7 @@
  * UNEXPECTED if an unexpected error occurs, and UNEXPECTED_INPUT if the
  * menu receives an input that it doesn't know how to handle.
  */
-int menu() {
+error_codes menu() {
 	char buffer[MAX_LINE_BUFF + 1], *command;
 	park_index parks = {NULL, NULL, 0};
 	vehicle_index vehicles = {
@@ -50,7 +50,8 @@ int menu() {
  * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT
  * if the 'q' command is received.
  */
-int run_command(char *command, park_index *parks, vehicle_index *vehicles) {
+error_codes
+run_command(char *command, park_index *parks, vehicle_index *vehicles) {
 	// Point to args
 	char *args = command;
 	args = remove_whitespaces(++args);

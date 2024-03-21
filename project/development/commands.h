@@ -19,11 +19,11 @@
 
 /// Function to run the COMMAND_CREATE_OR_VIEW command, which creates a new
 /// parking lot or lists existing ones
-int run_p(char *args, park_index *parks);
+error_codes run_p(char *args, park_index *parks);
 
 /// Function to run the COMMAND_ADD_VEHICLE command, which registers the entry
 /// of a vehicle
-int run_e(char *args, park_index *parks, vehicle_index *vehicles);
+error_codes run_e(char *args, park_index *parks, vehicle_index *vehicles);
 
 void run_e_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
@@ -32,7 +32,7 @@ void run_e_errochecking(
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
 /// exit of a vehicle
-int run_s(char *args, park_index *parks, vehicle_index *vehicles);
+error_codes run_s(char *args, park_index *parks, vehicle_index *vehicles);
 
 void run_s_args(
 	char **args, char **name, char *license_plate, date *timestamp,
@@ -46,15 +46,15 @@ void run_s_errochecking(
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information
-int run_v(char *args, vehicle_index *vehicles);
+error_codes run_v(char *args, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing
 /// of a parking lot
-int run_f(char *args, park_index *parks);
+error_codes run_f(char *args, park_index *parks);
 
 /// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
 /// lot from the system
-int run_r(char *args, park_index *parks);
+error_codes run_r(char *args, park_index *parks);
 
 /// @}
 

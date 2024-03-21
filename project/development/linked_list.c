@@ -381,10 +381,9 @@ int get_non_null_registries(registry *first_reg, registry ***destination) {
 			(current->type == EXIT &&
 			 current->registration->exit.park_ptr != NULL)) {
 			// Resize array in chunks
-			if (count % DEFAULT_CHUNK_SIZE == 0) {
+			if (count % CHUNK_SIZE == 0) {
 				*destination = realloc(
-					*destination,
-					(count + DEFAULT_CHUNK_SIZE) * sizeof(registry *)
+					*destination, (count + CHUNK_SIZE) * sizeof(registry *)
 				);
 			}
 			(*destination)[count] = current;
@@ -412,6 +411,7 @@ void show_billing(park *parking) {
 	float total_cost = 0;
 
 	current_reg = find_reg(parking->registries, EXIT);
+	if(current_reg == NULL) return;
 	old_date = &(current_reg->registration->exit.timestamp);
 
 	while (current_reg != NULL) {
@@ -474,10 +474,9 @@ int get_park_names(park_index *parks, char ***park_names) {
 	park *current = parks->first;
 	int count = 0;
 	while (current != NULL) {
-		if (count % 10 == DEFAULT_CHUNK_SIZE) {
-			*park_names = realloc(
-				*park_names, (count + DEFAULT_CHUNK_SIZE) * sizeof(char *)
-			);
+		if (count % 10 == CHUNK_SIZE) {
+			*park_names =
+				realloc(*park_names, (count + CHUNK_SIZE) * sizeof(char *));
 		}
 		(*park_names)[count] = current->name;
 		count++;

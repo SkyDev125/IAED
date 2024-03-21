@@ -18,9 +18,58 @@
 /// Buffer size for reading input from the command line
 #define MAX_LINE_BUFF 8192
 
-#define DEFAULT_CHUNK_SIZE 100
+/// Chunk size to allocate memory in most situations
+#define CHUNK_SIZE 100
 
+/// Hash-map default size
 #define HASH_SIZE 100
+
+/// @}
+
+/// @defgroup command_constants Command related constants
+/// @{
+
+/// Valid commands
+enum commands {
+	COMMAND_EXIT = 'q',
+	CREATE_OR_VIEW = 'p',
+	ADD_VEHICLE = 'e',
+	REMOVE_VEHICLE = 's',
+	VIEW_VEHICLE = 'v',
+	PARK_BILLING = 'f',
+	REMOVE_PARK = 'r'
+};
+
+/// @}
+
+/// @defgroup park_vehicle_constants Park & Vehicle related constants
+/// @{
+
+/// Maximum number of parks
+#define MAX_PARKS 20
+
+/// Maximum size of License plates
+#define LICENSE_PLATE_SIZE 8
+
+/// Maximum size of date
+#define DATE_READ_SIZE 10
+
+/// Maximum size of hour
+#define HOUR_READ_SIZE 5
+
+/// Step in minutes for counting the cost
+#define PARK_PAY_STEP 15
+
+/// Blocks of time that will be counted at a different price
+#define TOTAL_INITIAL_BLOCKS 4
+
+/// @}
+
+/// @defgroup Registry related constants
+/// @{
+
+/// Valid Registry types
+typedef enum registry_types_e { ENTER, EXIT, UNDEFINED } registry_types;
 
 /// @}
 
@@ -51,63 +100,15 @@ enum months {
 
 /// @}
 
-/// @defgroup command_constants Command related constants
-/// @{
-
-/// Maximum number of arguments that can be passed to a command in the command
-/// line interface
-#define MAX_ARGS_SIZE 5
-
-/// Valid commands
-enum commands {
-	COMMAND_EXIT = 'q',
-	CREATE_OR_VIEW = 'p',
-	ADD_VEHICLE = 'e',
-	REMOVE_VEHICLE = 's',
-	VIEW_VEHICLE = 'v',
-	PARK_BILLING = 'f',
-	REMOVE_PARK = 'r'
-};
-
-/// @}
-
-/// @defgroup park_constants Park related constants
-/// @{
-
-/// Maximum number of parks
-#define MAX_PARKS 20
-
-/// Maximum size of License plates
-#define LICENSE_PLATE_SIZE 8
-
-/// Maximum size of date
-#define DATE_MAX_SIZE 10
-
-/// Maximum size of hour
-#define HOUR_MAX_SIZE 5
-
-/// Step in minutes for counting the cost
-#define PARK_PAY_STEP 15
-
-/// Blocks of time that will be counted at a different price
-#define TOTAL_INITIAL_BLOCKS 4
-
-/// @}
-
 /// @defgroup exit_codes Exit code constants
 /// @{
 
-/// Return code for successful operation
-#define SUCCESSFUL 0
-
-/// Return code for successful program exit
-#define SUCCESSFUL_EXIT 1
-
-/// Return code for unexpected error
-#define UNEXPECTED 2
-
-/// Return code for unexpected input
-#define UNEXPECTED_INPUT 3
+typedef enum error_codes_e {
+	SUCCESSFUL = 0,
+	SUCCESSFUL_EXIT = 1,
+	UNEXPECTED = 2,
+	UNEXPECTED_INPUT = 3
+} error_codes;
 
 /// @}
 
@@ -122,14 +123,6 @@ enum commands {
 
 /// Alias for boolean
 typedef char bool;
-
-/// @}
-
-/// @defgroup Registry related constants
-/// @{
-
-/// Valid Registry types
-typedef enum registry_types_e { ENTER, EXIT, UNDEFINED } registry_types;
 
 /// @}
 
