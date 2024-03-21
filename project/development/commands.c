@@ -109,6 +109,8 @@ void run_e_errochecking(
 	} else if (!is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
 		return;
+	} else if (!is_valid_date(timestamp)) {
+		sprintf(err, "invalid date.\n");
 	}
 
 	if (temp_vehicle != NULL) {
@@ -187,6 +189,8 @@ void run_s_errochecking(
 	} else if (!is_licence_plate(license_plate)) {
 		sprintf(err, "%s: invalid licence plate.\n", license_plate);
 		return;
+	} else if (!is_valid_date(timestamp)) {
+		sprintf(err, "invalid date.\n");
 	}
 
 	if (temp_vehicle != NULL) {
@@ -306,8 +310,7 @@ void verify_date_registry(registry *last_reg, char *err, date *timestamp) {
 				 timestamp->total_mins) ||
 			(last_reg->type == EXIT &&
 			 last_reg->registration->exit.timestamp.total_mins >
-				 timestamp->total_mins) ||
-			!is_valid_date(timestamp)) {
+				 timestamp->total_mins)) {
 			sprintf(err, "invalid date.\n");
 		}
 	}
