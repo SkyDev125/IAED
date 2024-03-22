@@ -411,7 +411,7 @@ void show_billing(park *parking) {
 	float total_cost = 0;
 
 	current_reg = find_reg(parking->registries, EXIT);
-	if(current_reg == NULL) return;
+	if (current_reg == NULL) return;
 	old_date = &(current_reg->registration->exit.timestamp);
 
 	while (current_reg != NULL) {

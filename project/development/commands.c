@@ -116,7 +116,8 @@ void run_e_errochecking(
 	if (temp_vehicle != NULL) {
 		last_vehicle_registry = temp_vehicle->last_reg;
 		if (last_vehicle_registry == NULL ||
-			last_vehicle_registry->type != EXIT) {
+			(last_vehicle_registry->type != EXIT &&
+			 last_vehicle_registry->registration->enter.park_ptr != NULL)) {
 			sprintf(err, "%s: invalid vehicle entry.\n", license_plate);
 			return;
 		}
@@ -246,9 +247,9 @@ error_codes run_v(char *args, vehicle_index *vehicles) {
 	return SUCCESSFUL;
 }
 
-error_codes run_f(char *args, park_index *parks) {
-	char *name;
-	date timestamp;
+error_codes run_f(char *args, park_index *parks, date *sysdate) {
+	char *name, err[MAX_LINE_BUFF] = {};
+	date timestamp = {.minutes = 0, .hours = 0};
 	park *parking;
 	int name_size = str_size(&args);
 
@@ -269,6 +270,15 @@ error_codes run_f(char *args, park_index *parks) {
 	}
 
 	args = parse_date(args, &timestamp);
+	timestamp.total_mins = date_to_minutes(&timestamp);
+	verify_date_registry(sysdate, err, &timestamp);
+
+	if (timestamp.total_mins > sysdate->total_mins) {
+		printf("invalid date.\n");
+		free(name);
+		return UNEXPECTED_INPUT;
+	}
+
 	show_billing_day(parking, &timestamp);
 
 	free(name);

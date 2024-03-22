@@ -33,7 +33,9 @@ error_codes menu() {
 		}
 
 		command = remove_whitespaces(buffer);
-		if (run_command(command, &parks, &vehicles, &sysdate) == SUCCESSFUL_EXIT) break;
+		if (run_command(command, &parks, &vehicles, &sysdate) ==
+			SUCCESSFUL_EXIT)
+			break;
 	}
 
 	free_all(&parks, &vehicles);
@@ -70,7 +72,7 @@ error_codes run_command(
 	case VIEW_VEHICLE:
 		return run_v(args, vehicles);
 	case PARK_BILLING:
-		return run_f(args, parks);
+		return run_f(args, parks, sysdate);
 	case REMOVE_PARK:
 		return run_r(args, parks);
 	default:

@@ -52,7 +52,7 @@ error_codes run_v(char *args, vehicle_index *vehicles);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing
 /// of a parking lot
-error_codes run_f(char *args, park_index *parks);
+error_codes run_f(char *args, park_index *parks, date *sysdate);
 
 /// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
 /// lot from the system
