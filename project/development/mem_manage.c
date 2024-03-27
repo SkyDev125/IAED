@@ -82,7 +82,8 @@ void clean_vehicle_registries(registry *reg) {
  * @param vehicles Pointer to the vehicle index.
  */
 void remove_all_vehicles(vehicle_index *vehicles) {
-	for (int i = 0; i < vehicles->size; i++) {
+	int i;
+	for (i = 0; i < vehicles->size; i++) {
 		vehicle *current_vehicle = vehicles->buckets[i], *next_vehicle;
 
 		while (current_vehicle != NULL) {

@@ -40,10 +40,10 @@ error_codes run_p(char *buff, park_index *parks) {
 		sprintf(args.err, "%s: parking already exists.\n", args.name);
 	} else if (args.capacity <= 0) {
 		sprintf(args.err, "%i: invalid capacity.\n", args.capacity);
-	} else if (args.first_value <= 0 // clang-format off.
+	} else if (args.first_value <= 0
 				|| args.first_value > args.value 
 				|| args.value > args.day_value) {
-		sprintf(args.err, "invalid cost.\n"); // clang-format on.
+		sprintf(args.err, "invalid cost.\n");
 	} else if (parks->park_num == MAX_PARKS) {
 		sprintf(args.err, "too many parks.\n");
 	}
@@ -123,7 +123,7 @@ void run_e_errochecking(e_args *args, sys *system) {
 		last_vehicle_reg = args->vehicle->last_reg;
 		if (last_vehicle_reg == NULL ||
 			(last_vehicle_reg->type != EXIT &&
-			 last_vehicle_reg->registration->enter.park_ptr != NULL)) {
+				last_vehicle_reg->registration->enter.park_ptr != NULL)) {
 			sprintf(
 				args->err, "%s: invalid vehicle entry.\n", args->license_plate
 			);

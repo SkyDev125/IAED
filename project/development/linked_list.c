@@ -48,9 +48,10 @@ void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
 	vehicle **new_buckets = calloc(new_size, sizeof(vehicle *)),
 			*current_vehicle, *next_vehicle;
 	unsigned long new_hash;
+	int i;
 
 	// Iterate over the old hash table and rehash all vehicles.
-	for (int i = 0; i < vehicles->size; i++) {
+	for (i = 0; i < vehicles->size; i++) {
 		current_vehicle = vehicles->buckets[i];
 		while (current_vehicle != NULL) {
 			next_vehicle = current_vehicle->next;
@@ -381,11 +382,10 @@ int get_non_null_registries(registry *first_reg, registry ***destination) {
 	int count = 0;
 	registry *current = first_reg;
 	while (current != NULL) {
-		if ((current->type == ENTER && // clang-format off
+		if ((current->type == ENTER &&
 				current->registration->enter.park_ptr != NULL) ||
 			(current->type == EXIT &&
 				current->registration->exit.park_ptr != NULL)) {
-			// clang-format on
 
 			// Resize array in chunks
 			if (count % CHUNK_SIZE == 0) {

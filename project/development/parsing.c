@@ -12,9 +12,9 @@
 #include "headers.h"
 
 // Array with total days in a month.
-const int days_in_month[] = { // clang-format off.
+const int days_in_month[] = {
 	JAN, FEB, MAR, APR, MAY, JUN,
-	JUL, AUG, SEP, OCT, NOV, DEC}; // clang-format on
+	JUL, AUG, SEP, OCT, NOV, DEC};
 
 /**
  * @brief Removes leading whitespaces from a string.
@@ -165,10 +165,11 @@ bool is_licence_plate(char *str) {
  */
 long int date_to_minutes(date *d) {
 	long int minutes;
+	int i;
 
 	minutes = (long int)d->years * DAYS_IN_YEAR * MINS_PER_DAY;
 
-	for (int i = 0; i < (d->months - 1); i++) {
+	for (i = 0; i < (d->months - 1); i++) {
 		minutes += days_in_month[i] * MINS_PER_DAY;
 	}
 

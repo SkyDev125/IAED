@@ -14,7 +14,7 @@
 
 #include "headers.h"
 
-// Forward declarations
+/// Forward declarations
 typedef struct park_struct park;
 typedef struct vehicle_struct vehicle;
 
