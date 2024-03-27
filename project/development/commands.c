@@ -40,8 +40,10 @@ error_codes run_p(char *buff, park_index *parks) {
 		sprintf(args.err, "%s: parking already exists.\n", args.name);
 	} else if (args.capacity <= 0) {
 		sprintf(args.err, "%i: invalid capacity.\n", args.capacity);
-	} else if (args.first_value <= 0 || args.first_value > args.value || args.value > args.day_value) {
-		sprintf(args.err, "invalid cost.\n");
+	} else if (args.first_value <= 0 // clang-format off
+				|| args.first_value > args.value 
+				|| args.value > args.day_value) {
+		sprintf(args.err, "invalid cost.\n"); // clang-format on
 	} else if (parks->park_num == MAX_PARKS) {
 		sprintf(args.err, "too many parks.\n");
 	}
@@ -87,7 +89,7 @@ error_codes run_e(char *buff, sys *system) {
 }
 
 void run_e_errochecking(e_args *args, sys *system) {
-	registry *last_vehicle_registry;
+	registry *last_vehicle_reg;
 
 	if (args->park == NULL) {
 		sprintf(args->err, "%s: no such parking.\n", args->name);
@@ -103,10 +105,10 @@ void run_e_errochecking(e_args *args, sys *system) {
 	}
 
 	if (args->vehicle != NULL) {
-		last_vehicle_registry = args->vehicle->last_reg;
-		if (last_vehicle_registry == NULL ||
-			(last_vehicle_registry->type != EXIT &&
-			 last_vehicle_registry->registration->enter.park_ptr != NULL)) {
+		last_vehicle_reg = args->vehicle->last_reg;
+		if (last_vehicle_reg == NULL ||
+			(last_vehicle_reg->type != EXIT &&
+			 last_vehicle_reg->registration->enter.park_ptr != NULL)) {
 			sprintf(
 				args->err, "%s: invalid vehicle entry.\n", args->license_plate
 			);
@@ -175,7 +177,7 @@ void run_s_errochecking(
 	park *parking, char *name, char *err, char *license_plate, date *timestamp,
 	vehicle *temp_vehicle, date *sysdate
 ) {
-	registry *last_vehicle_registry;
+	registry *last_vehicle_reg;
 
 	if (parking == NULL) {
 		sprintf(err, "%s: no such parking.\n", name);
@@ -186,16 +188,15 @@ void run_s_errochecking(
 	}
 
 	if (temp_vehicle != NULL) {
-		last_vehicle_registry = temp_vehicle->last_reg;
+		last_vehicle_reg = temp_vehicle->last_reg;
 	} else {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
 		return;
 	}
 
-	if (last_vehicle_registry == NULL ||
-		last_vehicle_registry->type != ENTER) {
+	if (last_vehicle_reg == NULL || last_vehicle_reg->type != ENTER) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	} else if (last_vehicle_registry->registration->enter.park_ptr != parking) {
+	} else if (last_vehicle_reg->registration->enter.park_ptr != parking) {
 		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
 	} else {
 		verify_date_registry(sysdate, err, timestamp);
