@@ -1,10 +1,9 @@
 /**
  * @file linked_list.c
  * @author Diogo Santos (ist1110262)
- * @brief This file contains the implementation of a linked list for managing
- * parks.
- * @version 0.1
- * @date 10-03-2024
+ * @brief Implementation of linked lists & hashmaps.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

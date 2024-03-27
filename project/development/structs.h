@@ -2,8 +2,8 @@
  * @file structs.h
  * @author Diogo Santos (ist1110262)
  * @brief This file includes all the structs for the project.
- * @version 0.1
- * @date 10-03-2024
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

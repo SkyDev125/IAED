@@ -2,8 +2,8 @@
  * @file menu.h
  * @author Diogo Santos (ist1110262)
  * @brief Function declarations for the menu interface.
- * @version 0.1
- * @date 10-03-2024
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

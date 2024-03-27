@@ -253,7 +253,10 @@ error_codes run_v(char *buff, vehicle_index *vehicles) {
 	}
 
 	// Execute the command.
-	merge_sort(args.non_null_regs, 0, args.count - 1);
+	merge_sort(
+		(void **)args.non_null_regs, 0, args.count - 1,
+		(comp_func)compare_regs_park
+	);
 	show_all_regs(args.non_null_regs, args.vehicle->last_reg, &(args.count));
 
 	free(args.non_null_regs);
@@ -361,7 +364,7 @@ error_codes run_r(char *buff, park_index *parks) {
 	// Execute the command.
 	remove_park(args.park, parks);
 	args.count = get_park_names(parks, &args.names);
-	merge_sort_names(args.names, 0, args.count - 1);
+	merge_sort((void **)args.names, 0, args.count - 1, (comp_func)strcmp);
 	for (args.i = 0; args.i < args.count; args.i++) {
 		printf("%s\n", args.names[args.i]);
 	}

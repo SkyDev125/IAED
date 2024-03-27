@@ -1,9 +1,9 @@
 /**
  * @file parsing.c
  * @author Diogo Santos (ist1110262)
- * @brief Parsing utilities for command line arguments
- * @version 0.1
- * @date 10-03-2024
+ * @brief Parsing utilities for command line arguments.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

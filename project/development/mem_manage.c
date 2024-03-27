@@ -1,9 +1,9 @@
 /**
  * @file mem_manage.c
  * @author Diogo Santos (ist1110262)
- * @brief This file implements the functions for memory management.
- * @version 0.1
- * @date 10-03-2024
+ * @brief Functions for memory management.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

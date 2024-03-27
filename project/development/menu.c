@@ -1,9 +1,9 @@
 /**
  * @file menu.c
  * @author Diogo Santos (ist1110262)
- * @brief Contains the main menu loop and command execution functions
- * @version 0.1
- * @date 10-03-2024
+ * @brief Main menu loop and command execution functions.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *

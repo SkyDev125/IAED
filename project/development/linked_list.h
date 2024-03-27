@@ -1,9 +1,9 @@
 /**
  * @file linked_list.h
  * @author Diogo Santos (ist1110262)
- * @brief This file contains the definitions for a linked list of parking lots.
- * @version 0.1
- * @date 10-03-2024
+ * @brief Definitions of linked lists and hashmaps.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *
