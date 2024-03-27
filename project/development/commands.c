@@ -15,303 +15,286 @@
  * @brief Runs the COMMAND_CREATE_OR_VIEW command, which creates a new parking
  * lot or lists existing ones.
  *
- * @param args An array of void pointers to the arguments of the command.
+ * @param buff An array of void pointers to the arguments of the command.
  * @return SUCCESSFUL if the command is executed successfully,
  * UNEXPECTED if an error occurs.
  */
-error_codes run_p(char *args, park_index *parks) {
-	char *name, err[MAX_LINE_BUFF] = {};
-	int name_size, capacity;
-	float first_value, value, day_value;
+error_codes run_p(char *buff, park_index *parks) {
+	p_args args = {.err = {}};
 
-	if (*args == '\0') {
+	if (*buff == '\0') {
 		show_parks(parks);
 		return SUCCESSFUL;
 	}
 
 	// Get the necessary arguments
-	name_size = str_size(&args);
-	name = parse_string(args, &args, &name_size);
-	capacity = strtol(args, &args, 0);
-	first_value = strtof(args, &args);
-	value = strtof(args, &args);
-	day_value = strtof(args, &args);
+	args.name_size = str_size(&buff);
+	args.name = parse_string(buff, &buff, &(args.name_size));
+	args.capacity = strtol(buff, &buff, 0);
+	args.first_value = strtof(buff, &buff);
+	args.value = strtof(buff, &buff);
+	args.day_value = strtof(buff, &buff);
 
 	// Error checking
-	if (find_park(name, hash(name), parks) != NULL) {
-		sprintf(err, "%s: parking already exists.\n", name);
-	} else if (capacity <= 0) {
-		sprintf(err, "%i: invalid capacity.\n", capacity);
-	} else if (first_value <= 0 || first_value > value || value > day_value) {
-		sprintf(err, "invalid cost.\n");
+	if (find_park(args.name, hash(args.name), parks) != NULL) {
+		sprintf(args.err, "%s: parking already exists.\n", args.name);
+	} else if (args.capacity <= 0) {
+		sprintf(args.err, "%i: invalid capacity.\n", args.capacity);
+	} else if (args.first_value <= 0 || args.first_value > args.value || args.value > args.day_value) {
+		sprintf(args.err, "invalid cost.\n");
 	} else if (parks->park_num == MAX_PARKS) {
-		sprintf(err, "too many parks.\n");
+		sprintf(args.err, "too many parks.\n");
 	}
 
-	if (err[0] != '\0') {
-		printf("%s", err);
+	if (args.err[0] != '\0') {
+		printf("%s", args.err);
 		return UNEXPECTED_INPUT;
 	}
 
-	add_park(name, &capacity, &first_value, &value, &day_value, parks);
+	add_park(&args, parks);
 
 	return SUCCESSFUL;
 }
 
-error_codes
-run_e(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate) {
-	int name_size;
-	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
-	date timestamp;
-	park *parking;
-	vehicle *temp_vehicle;
+error_codes run_e(char *buff, sys *system) {
+	e_args args = {.err = {}};
 
 	// Get the necessary arguments
-	name_size = str_size(&args);
-	name = parse_string(args, &args, &name_size);
-	args = parse_license_plate(args, license_plate);
-	args = parse_date(args, &timestamp);
-	args = parse_time(args, &timestamp);
-	timestamp.total_mins = date_to_minutes(&timestamp);
-	parking = find_park(name, hash(name), parks);
-	temp_vehicle = find_vehicle(license_plate, vehicles);
+	args.name_size = str_size(&buff);
+	args.name = parse_string(buff, &buff, &args.name_size);
+	buff = parse_license_plate(buff, args.license_plate);
+	buff = parse_date(buff, &(args.timestamp));
+	buff = parse_time(buff, &(args.timestamp));
+	args.timestamp.total_mins = date_to_minutes(&(args.timestamp));
+	args.park = find_park(args.name, hash(args.name), &(system->parks));
+	args.vehicle = find_vehicle(args.license_plate, &(system->vehicles));
 
 	// Error checking
-	run_e_errochecking(
-		parking, name, err, license_plate, &timestamp, temp_vehicle, sysdate
-	);
-
-	if (err[0] != '\0') {
-		printf("%s", err);
-		free(name);
+	run_e_errochecking(&args, system);
+	if (args.err[0] != '\0') {
+		printf("%s", args.err);
+		free(args.name);
 		return UNEXPECTED_INPUT;
 	}
-	*sysdate = timestamp;
-	register_entrance(
-		license_plate, vehicles, parking, &timestamp, temp_vehicle
-	);
-	printf("%s %i\n", name, parking->free_spaces);
 
-	free(name);
+	// Execute the entrance
+	system->sysdate = args.timestamp;
+	register_entrance(&args, &(system->vehicles));
+	printf("%s %i\n", args.name, (args.park)->free_spaces);
+
+	free(args.name);
 	return SUCCESSFUL;
 }
 
-void run_e_errochecking(
-	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, date *sysdate
-) {
+void run_e_errochecking(e_args *args, sys *system) {
 	registry *last_vehicle_registry;
 
-	if (parking == NULL) {
-		sprintf(err, "%s: no such parking.\n", name);
+	if (args->park == NULL) {
+		sprintf(args->err, "%s: no such parking.\n", args->name);
 		return;
-	} else if (parking->free_spaces == 0) {
-		sprintf(err, "%s: parking is full.\n", name);
+	} else if (args->park->free_spaces == 0) {
+		sprintf(args->err, "%s: parking is full.\n", args->name);
 		return;
-	} else if (!is_licence_plate(license_plate)) {
-		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	} else if (!is_licence_plate(args->license_plate)) {
+		sprintf(
+			args->err, "%s: invalid licence plate.\n", args->license_plate
+		);
 		return;
 	}
 
-	if (temp_vehicle != NULL) {
-		last_vehicle_registry = temp_vehicle->last_reg;
+	if (args->vehicle != NULL) {
+		last_vehicle_registry = args->vehicle->last_reg;
 		if (last_vehicle_registry == NULL ||
 			(last_vehicle_registry->type != EXIT &&
 			 last_vehicle_registry->registration->enter.park_ptr != NULL)) {
-			sprintf(err, "%s: invalid vehicle entry.\n", license_plate);
+			sprintf(
+				args->err, "%s: invalid vehicle entry.\n", args->license_plate
+			);
 			return;
 		}
 	}
 
-	verify_date_registry(sysdate, err, timestamp);
+	verify_date_registry(&(system->sysdate), args->err, &(args->timestamp));
 }
 
-error_codes
-run_s(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate) {
-	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF] = {};
-	date timestamp, start_timestamp;
-	park *parking;
-	vehicle *temp_vehicle;
-	float cost;
+error_codes run_s(char *buff, sys *system) {
+	s_args args = {.err = {}};
 
 	// Get the necessary arguments
-	run_s_args(&args, &name, license_plate, &timestamp, &parking, parks);
-	temp_vehicle = find_vehicle(license_plate, vehicles);
+	run_s_args(&buff, &args, &(system->parks));
+	args.vehicle = find_vehicle(args.license_plate, &(system->vehicles));
 
 	// Error checking
-	run_s_errochecking(
-		parking, name, err, license_plate, &timestamp, temp_vehicle, sysdate
-	);
+	run_s_errochecking(&args, &(system->sysdate));
 
-	if (err[0] != '\0') {
-		printf("%s", err);
-		free(name);
+	if (args.err[0] != '\0') {
+		printf("%s", args.err);
+		free(args.name);
 		return UNEXPECTED_INPUT;
 	}
 
-	start_timestamp = temp_vehicle->last_reg->registration->enter.timestamp;
-	cost = calculate_cost(&start_timestamp, &timestamp, parking);
-	*sysdate = timestamp;
-	register_exit(parking, &timestamp, temp_vehicle, &cost);
+	args.start = args.vehicle->last_reg->registration->enter.timestamp;
+	args.cost = calculate_cost(&args.start, &args.end, args.park);
+	system->sysdate = args.start;
+	register_exit(&args);
 
 	printf(
 		"%s %02d-%02d-%04d %02d:%02d %02d-%02d-%04d %02d:%02d %.2f\n",
-		license_plate, start_timestamp.days, start_timestamp.months,
-		start_timestamp.years, start_timestamp.hours, start_timestamp.minutes,
-		timestamp.days, timestamp.months, timestamp.years, timestamp.hours,
-		timestamp.minutes, cost
+		args.license_plate, args.start.days, args.start.months,
+		args.start.years, args.start.hours, args.start.minutes, args.end.days,
+		args.end.months, args.end.years, args.end.hours, args.end.minutes,
+		args.cost
 	);
 
-	free(name);
+	free(args.name);
 	return SUCCESSFUL;
 }
 
-void run_s_args(
-	char **args, char **name, char *license_plate, date *timestamp,
-	park **parking, park_index *parks
-) {
+void run_s_args(char **buff, s_args *args, park_index *parks) {
 	int name_size;
-	name_size = str_size(args);
-	*name = parse_string(*args, args, &name_size);
-	*args = parse_license_plate(*args, license_plate);
-	*args = parse_date(*args, timestamp);
-	*args = parse_time(*args, timestamp);
-	timestamp->total_mins = date_to_minutes(timestamp);
-	*parking = find_park(*name, hash(*name), parks);
+	name_size = str_size(buff);
+	args->name = parse_string(*buff, buff, &name_size);
+	*buff = parse_license_plate(*buff, args->license_plate);
+	*buff = parse_date(*buff, &(args->end));
+	*buff = parse_time(*buff, &(args->end));
+	args->end.total_mins = date_to_minutes(&(args->end));
+	args->park = find_park(args->name, hash(args->name), parks);
 }
 
-void run_s_errochecking(
-	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, date *sysdate
-) {
+void run_s_errochecking(s_args *args, date *sysdate) {
 	registry *last_vehicle_registry;
 
-	if (parking == NULL) {
-		sprintf(err, "%s: no such parking.\n", name);
+	if (args->park == NULL) {
+		sprintf(args->err, "%s: no such parking.\n", args->name);
 		return;
-	} else if (!is_licence_plate(license_plate)) {
-		sprintf(err, "%s: invalid licence plate.\n", license_plate);
+	} else if (!is_licence_plate(args->license_plate)) {
+		sprintf(
+			args->err, "%s: invalid licence plate.\n", args->license_plate
+		);
 		return;
 	}
 
-	if (temp_vehicle != NULL) {
-		last_vehicle_registry = temp_vehicle->last_reg;
+	if (args->vehicle != NULL) {
+		last_vehicle_registry = args->vehicle->last_reg;
 	} else {
-		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
+		sprintf(args->err, "%s: invalid vehicle exit.\n", args->license_plate);
 		return;
 	}
 
 	if (last_vehicle_registry == NULL ||
 		last_vehicle_registry->type != ENTER) {
-		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
-	} else if (last_vehicle_registry->registration->enter.park_ptr != parking) {
-		sprintf(err, "%s: invalid vehicle exit.\n", license_plate);
+		sprintf(args->err, "%s: invalid vehicle exit.\n", args->license_plate);
+	} else if (last_vehicle_registry->registration->enter.park_ptr != args->park) {
+		sprintf(args->err, "%s: invalid vehicle exit.\n", args->license_plate);
 	} else {
-		verify_date_registry(sysdate, err, timestamp);
+		verify_date_registry(sysdate, args->err, &(args->end));
 	}
 }
 
-error_codes run_v(char *args, vehicle_index *vehicles) {
-	char license_plate[9], err[MAX_LINE_BUFF] = {};
-	license_plate[LICENSE_PLATE_SIZE] = '\0';
-	vehicle *temp_vehicle;
-	registry **non_null_regs = malloc(sizeof(registry *) * CHUNK_SIZE);
-	int count = 0;
+error_codes run_v(char *buff, vehicle_index *vehicles) {
+	v_args args = {
+		.err = {}, .non_null_regs = malloc(sizeof(registry *) * CHUNK_SIZE)};
 
-	parse_license_plate(args, license_plate);
-	temp_vehicle = find_vehicle(license_plate, vehicles);
+	parse_license_plate(buff, args.license_plate);
+	args.vehicle = find_vehicle(args.license_plate, vehicles);
 
-	if (!is_licence_plate(license_plate)) {
-		sprintf(err, "%s: invalid licence plate.\n", license_plate);
-	} else if (temp_vehicle == NULL) {
-		sprintf(err, "%s: no entries found in any parking.\n", license_plate);
-	} else {
-		count =
-			get_non_null_registries(temp_vehicle->registries, &non_null_regs);
-		if (count == 0)
-			sprintf(
-				err, "%s: no entries found in any parking.\n", license_plate
-			);
-	}
-
-	if (err[0] != '\0') {
-		printf("%s", err);
-		free(non_null_regs);
+	run_v_errorchecking(&args);
+	if (args.err[0] != '\0') {
+		printf("%s", args.err);
+		free(args.non_null_regs);
 		return UNEXPECTED_INPUT;
 	}
 
-	merge_sort(non_null_regs, 0, count - 1);
-	show_all_regs(non_null_regs, temp_vehicle->last_reg, &count);
+	merge_sort(args.non_null_regs, 0, args.count - 1);
+	show_all_regs(args.non_null_regs, args.vehicle->last_reg, &(args.count));
 
-	free(non_null_regs);
+	free(args.non_null_regs);
 	return SUCCESSFUL;
 }
 
-error_codes run_f(char *args, park_index *parks, date *sysdate) {
-	char *name, err[MAX_LINE_BUFF] = {};
-	date timestamp = {.minutes = 0, .hours = 0};
-	park *parking;
-	int name_size = str_size(&args);
+void run_v_errorchecking(v_args *args) {
+	if (!is_licence_plate(args->license_plate)) {
+		sprintf(
+			args->err, "%s: invalid licence plate.\n", args->license_plate
+		);
+	} else if (args->vehicle == NULL) {
+		sprintf(
+			args->err, "%s: no entries found in any parking.\n",
+			args->license_plate
+		);
+	} else {
+		args->count = get_non_null_registries(
+			args->vehicle->registries, &(args->non_null_regs)
+		);
+		if (args->count == 0)
+			sprintf(
+				args->err, "%s: no entries found in any parking.\n",
+				args->license_plate
+			);
+	}
+}
 
-	name = parse_string(args, &args, &name_size);
-	parking = find_park(name, hash(name), parks);
-	args = remove_whitespaces(args);
+error_codes run_f(char *buff, sys *system) {
+	f_args args = {.err = {}, .timestamp = {.minutes = 0, .hours = 0}};
 
-	if (parking == NULL) {
-		printf("%s: no such parking.\n", name);
-		free(name);
+	args.name_size = str_size(&buff);
+	args.name = parse_string(buff, &buff, &(args.name_size));
+	args.park = find_park(args.name, hash(args.name), &(system->parks));
+	buff = remove_whitespaces(buff);
+
+	if (args.park == NULL) {
+		printf("%s: no such parking.\n", args.name);
+		free(args.name);
 		return UNEXPECTED_INPUT;
 	}
 
-	if (*args == '\0') {
-		show_billing(parking);
-		free(name);
+	if (*buff == '\0') {
+		show_billing(args.park);
+		free(args.name);
 		return SUCCESSFUL;
 	}
 
-	args = parse_date(args, &timestamp);
-	timestamp.total_mins = date_to_minutes(&timestamp);
-	verify_date_registry(sysdate, err, &timestamp);
+	buff = parse_date(buff, &args.timestamp);
+	args.timestamp.total_mins = date_to_minutes(&args.timestamp);
 
-	if (timestamp.total_mins > sysdate->total_mins) {
+	if (!is_valid_date(&(args.timestamp)) ||
+		args.timestamp.total_mins > system->sysdate.total_mins) {
 		printf("invalid date.\n");
-		free(name);
+		free(args.name);
 		return UNEXPECTED_INPUT;
 	}
 
-	show_billing_day(parking, &timestamp);
+	show_billing_day(args.park, &args.timestamp);
 
-	free(name);
+	free(args.name);
 	return SUCCESSFUL;
 }
 
-error_codes run_r(char *args, park_index *parks) {
-	int name_size, count, i;
-	char *name, **names = malloc(sizeof(char *) * CHUNK_SIZE);
-	park *parking;
+error_codes run_r(char *buff, park_index *parks) {
+	r_args args = {.names = malloc(sizeof(char *) * CHUNK_SIZE)};
 
-	name_size = str_size(&args);
-	name = parse_string(args, &args, &name_size);
-	parking = find_park(name, hash(name), parks);
+	args.name_size = str_size(&buff);
+	args.name = parse_string(buff, &buff, &args.name_size);
+	args.park = find_park(args.name, hash(args.name), parks);
 
-	if (parking == NULL) {
-		printf("%s: no such parking.\n", name);
-		free(name);
-		free(names);
+	if (args.park == NULL) {
+		printf("%s: no such parking.\n", args.name);
+		free(args.name);
+		free(args.names);
 		return UNEXPECTED_INPUT;
 	}
 
-	remove_park(parking, parks);
+	remove_park(args.park, parks);
 
-	count = get_park_names(parks, &names);
-	merge_sort_names(names, 0, count - 1);
+	args.count = get_park_names(parks, &args.names);
+	merge_sort_names(args.names, 0, args.count - 1);
 
-	for (i = 0; i < count; i++) {
-		printf("%s\n", names[i]);
+	for (args.i = 0; args.i < args.count; args.i++) {
+		printf("%s\n", args.names[args.i]);
 	}
 
-	free(name);
-	free(names);
+	free(args.name);
+	free(args.names);
 	return SUCCESSFUL;
 }
 

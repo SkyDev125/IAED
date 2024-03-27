@@ -19,26 +19,23 @@
  * menu receives an input that it doesn't know how to handle.
  */
 error_codes menu() {
-	char buffer[MAX_LINE_BUFF + 1], *command;
-	park_index parks = {NULL, NULL, 0};
-	vehicle_index vehicles = {
-		calloc(HASH_SIZE, sizeof(vehicle *)), HASH_SIZE, 0};
-	date sysdate = {0, 0, 0, 0, 0, 0};
+	sys system = {
+		.parks = {NULL, NULL, 0},
+		.vehicles = {calloc(HASH_SIZE, sizeof(vehicle *)), HASH_SIZE, 0},
+		.sysdate = {0, 0, 0, 0, 0, 0}};
 
 	// Main menu loop
 	while (TRUE) {
-		if (fgets(buffer, MAX_LINE_BUFF + 1, stdin) == NULL) {
-			free_all(&parks, &vehicles);
+		if (fgets(system.buff, MAX_LINE_BUFF + 1, stdin) == NULL) {
+			free_all(&system.parks, &system.vehicles);
 			return UNEXPECTED_INPUT;
 		}
 
-		command = remove_whitespaces(buffer);
-		if (run_command(command, &parks, &vehicles, &sysdate) ==
-			SUCCESSFUL_EXIT)
-			break;
+		system.command = remove_whitespaces(system.buff);
+		if (run_command(&system) == SUCCESSFUL_EXIT) break;
 	}
 
-	free_all(&parks, &vehicles);
+	free_all(&system.parks, &system.vehicles);
 	return SUCCESSFUL;
 }
 
@@ -53,28 +50,26 @@ error_codes menu() {
  * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT
  * if the 'q' command is received.
  */
-error_codes run_command(
-	char *command, park_index *parks, vehicle_index *vehicles, date *sysdate
-) {
+error_codes run_command(sys *system) {
 	// Point to args
-	char *args = command;
+	char *args = system->command;
 	args = remove_whitespaces(++args);
 
-	switch (*command) {
+	switch (*(system->command)) {
 	case COMMAND_EXIT:
 		return SUCCESSFUL_EXIT;
 	case CREATE_OR_VIEW:
-		return run_p(args, parks);
+		return run_p(args, &(system->parks));
 	case ADD_VEHICLE:
-		return run_e(args, parks, vehicles, sysdate);
+		return run_e(args, system);
 	case REMOVE_VEHICLE:
-		return run_s(args, parks, vehicles, sysdate);
+		return run_s(args, system);
 	case VIEW_VEHICLE:
-		return run_v(args, vehicles);
+		return run_v(args, &(system->vehicles));
 	case PARK_BILLING:
-		return run_f(args, parks, sysdate);
+		return run_f(args, system);
 	case REMOVE_PARK:
-		return run_r(args, parks);
+		return run_r(args, &(system->parks));
 	default:
 		return UNEXPECTED_INPUT;
 	}

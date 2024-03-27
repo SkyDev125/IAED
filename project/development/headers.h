@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "constants.h"
+#include "structs.h"
 #include "linked_list.h"
 #include "parsing.h"
 #include "sorting.h"

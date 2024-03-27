@@ -16,8 +16,6 @@
 error_codes menu();
 
 /// Executes the command specified by the user.
-error_codes run_command(
-	char *command, park_index *parks, vehicle_index *vehicles, date *sysdate
-);
+error_codes run_command(sys *system);
 
 #endif

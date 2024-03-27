@@ -19,44 +19,35 @@
 
 /// Function to run the COMMAND_CREATE_OR_VIEW command, which creates a new
 /// parking lot or lists existing ones
-error_codes run_p(char *args, park_index *parks);
+error_codes run_p(char *buff, park_index *parks);
 
 /// Function to run the COMMAND_ADD_VEHICLE command, which registers the entry
 /// of a vehicle
-error_codes
-run_e(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate);
+error_codes run_e(char *buff, sys *system);
 
-void run_e_errochecking(
-	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, date *sysdate
-) ;
+void run_e_errochecking(e_args *args, sys *system);
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
 /// exit of a vehicle
-error_codes
-run_s(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate);
+error_codes run_s(char *buff, sys *system);
 
-void run_s_args(
-	char **args, char **name, char *license_plate, date *timestamp,
-	park **parking, park_index *parks
-);
+void run_s_args(char **buff, s_args *args, park_index *parks);
 
-void run_s_errochecking(
-	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, date *sysdate
-);
+void run_s_errochecking(s_args *args, date *sysdate);
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information
-error_codes run_v(char *args, vehicle_index *vehicles);
+error_codes run_v(char *buff, vehicle_index *vehicles);
+
+void run_v_errorchecking(v_args *args);
 
 /// Function to run the COMMAND_PARK_BILLING command, which shows the billing
 /// of a parking lot
-error_codes run_f(char *args, park_index *parks, date *sysdate);
+error_codes run_f(char *buff, sys *system);
 
 /// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
 /// lot from the system
-error_codes run_r(char *args, park_index *parks);
+error_codes run_r(char *buff, park_index *parks);
 
 /// @}
 

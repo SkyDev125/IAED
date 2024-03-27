@@ -10,6 +10,7 @@
         "string.h": "c",
         "menu.h": "c",
         "linked_list.h": "c",
-        "commands.h": "c"
+        "commands.h": "c",
+        "ctype.h": "c"
     }
 }

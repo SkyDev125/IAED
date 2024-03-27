@@ -29,13 +29,7 @@ unsigned long hash(char *str) {
 }
 
 unsigned long vehicle_hash(char *license_plate, int hash_size) {
-	unsigned long hash = 5381;
-	int c;
-
-	while ((c = *license_plate++))
-		hash = ((hash << 5) + hash) + c;
-
-	return hash % hash_size;
+	return hash(license_plate) % hash_size;
 }
 
 void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
@@ -67,20 +61,17 @@ void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
  * @param value The cost for subsequent hours of parking.
  * @param day_value The cost for a full day of parking.
  */
-void add_park(
-	char *name, int *capacity, float *first_hour_value, float *value,
-	float *day_value, park_index *parks
-) {
+void add_park(p_args *args, park_index *parks) {
 	// Allocate memory for new park and initialize its fields
 	park *new_park = malloc(sizeof(park));
 
-	new_park->name = name;
-	new_park->hashed_name = hash(name);
-	new_park->capacity = *capacity;
-	new_park->free_spaces = *capacity;
-	new_park->first_hour_value = *first_hour_value;
-	new_park->value = *value;
-	new_park->day_value = *day_value;
+	new_park->name = args->name;
+	new_park->hashed_name = hash(args->name);
+	new_park->capacity = args->capacity;
+	new_park->free_spaces = args->capacity;
+	new_park->first_hour_value = args->first_value;
+	new_park->value = args->value;
+	new_park->day_value = args->day_value;
 	new_park->registries = NULL;
 	new_park->last_reg = NULL;
 	new_park->next = NULL;
@@ -228,43 +219,41 @@ vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles) {
 
 	return NULL;
 }
-void register_entrance(
-	char *license_plate, vehicle_index *vehicles, park *parking,
-	date *timestamp, vehicle *reg_vehicle
-) {
+
+void register_entrance(e_args *args, vehicle_index *vehicles) {
 	registry_union *entry = malloc(sizeof(registry_union));
 
 	// create vehicle if it doesnt exist
-	if (reg_vehicle == NULL) {
-		reg_vehicle = add_vehicle(license_plate, vehicles);
+	if (args->vehicle == NULL) {
+		args->vehicle = add_vehicle(args->license_plate, vehicles);
 	}
 
-	entry->enter.park_ptr = parking;
-	entry->enter.vehicle_ptr = reg_vehicle;
-	entry->enter.timestamp = *timestamp;
+	entry->enter.park_ptr = args->park;
+	entry->enter.vehicle_ptr = args->vehicle;
+	entry->enter.timestamp = args->timestamp;
 
 	add_entry(
-		&(reg_vehicle->registries), &(reg_vehicle->last_reg), entry, ENTER
+		&(args->vehicle->registries), &(args->vehicle->last_reg), entry, ENTER
 	);
-	add_entry(&(parking->registries), &(parking->last_reg), entry, ENTER);
-	(parking->free_spaces)--;
+	add_entry(
+		&(args->park->registries), &(args->park->last_reg), entry, ENTER
+	);
+	(args->park->free_spaces)--;
 }
 
-void register_exit(
-	park *parking, date *timestamp, vehicle *reg_vehicle, float *cost
-) {
+void register_exit(s_args *args) {
 	registry_union *entry = malloc(sizeof(registry_union));
 
-	entry->exit.park_ptr = parking;
-	entry->exit.vehicle_ptr = reg_vehicle;
-	entry->exit.timestamp = *timestamp;
-	entry->exit.cost = *cost;
+	entry->exit.park_ptr = args->park;
+	entry->exit.vehicle_ptr = args->vehicle;
+	entry->exit.timestamp = args->end;
+	entry->exit.cost = args->cost;
 
 	add_entry(
-		&(reg_vehicle->registries), &(reg_vehicle->last_reg), entry, EXIT
+		&(args->vehicle->registries), &(args->vehicle->last_reg), entry, EXIT
 	);
-	add_entry(&(parking->registries), &(parking->last_reg), entry, EXIT);
-	(parking->free_spaces)++;
+	add_entry(&(args->park->registries), &(args->park->last_reg), entry, EXIT);
+	(args->park->free_spaces)++;
 }
 
 void add_entry(

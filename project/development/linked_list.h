@@ -12,92 +12,13 @@
 #ifndef LINKED_LIST
 #define LINKED_LIST
 
-// Forward declarations
-typedef struct park_struct park;
-typedef struct vehicle_struct vehicle;
-
-/// Structure to represent a date.
-typedef struct {
-	long int total_mins;
-	int years, months, days, hours, minutes;
-} date;
-
-/// @defgroup registry_types Registration of entries and exit types.
-/// @{
-
-typedef struct {
-	vehicle *vehicle_ptr;
-	park *park_ptr;
-	date timestamp;
-} registry_enter;
-
-typedef struct {
-	vehicle *vehicle_ptr;
-	park *park_ptr;
-	date timestamp;
-	float cost;
-} registry_exit;
-
-typedef union {
-	registry_enter enter;
-	registry_exit exit;
-} registry_union;
-
-typedef struct registration {
-	registry_union *registration;
-	registry_types type;
-	struct registration *next;
-} registry;
-
-/// @}
-
-/// @defgroup park_vehicle_types Parks and Vehicle types
-/// @{
-
-/// Structure to represent a parking lot.
-typedef struct park_struct {
-	char *name;
-	unsigned long hashed_name;
-	int capacity, free_spaces;
-	float first_hour_value, value, day_value;
-	registry *registries;
-	registry *last_reg;
-	struct park_struct *next;
-	struct park_struct *previous;
-} park;
-
-/// Structure to represent an index of parking lots.
-typedef struct {
-	park *first, *last;
-	int park_num;
-} park_index;
-
-/// Structure to represent a vehicle.
-typedef struct vehicle_struct {
-	char license_plate[LICENSE_PLATE_SIZE + 1];
-	unsigned long hashed_plate;
-	registry *registries;
-	registry *last_reg;
-	vehicle *next;
-} vehicle;
-
-/// Structure to represent an index of vehicles.
-typedef struct {
-	vehicle **buckets;
-	int size;
-	int vehicle_num;
-} vehicle_index;
-
-/// @}
+#include "headers.h"
 
 /// @defgroup park_operations Parking Lot Operations
 /// @{
 
 /// Adds a new parking lot to the list.
-void add_park(
-	char *name, int *capacity, float *first_hour_value, float *value,
-	float *day_value, park_index *parks
-);
+void add_park(p_args *args, park_index *parks);
 
 /// Removes a parking lot from the list.
 void remove_park(park *parking, park_index *parks);
@@ -137,17 +58,13 @@ void clean_vehicle_registries(registry *reg);
 
 vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles);
 
-void register_entrance(
-	char *license_plate, vehicle_index *vehicles, park *park_enter,
-	date *timestamp, vehicle *reg_vehicle
-);
+void register_entrance(e_args *args, vehicle_index *vehicles);
 
-void register_exit(
-	park *park_enter, date *timestamp, vehicle *reg_vehicle, float *cost
-);
+void register_exit(s_args *args);
 
 void add_entry(
-	registry **reg, registry **last_reg, registry_union *entry, registry_types type
+	registry **reg, registry **last_reg, registry_union *entry,
+	registry_types type
 );
 
 /// @}
