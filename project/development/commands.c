@@ -1,9 +1,9 @@
 /**
  * @file commands.c
  * @author Diogo Santos (ist1110262)
- * @brief Contains the implementation of the commands for a parking lot system.
- * @version 0.1
- * @date 10-03-2024
+ * @brief Implementation of the commands for a parking lot system.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *
@@ -12,12 +12,11 @@
 #include "headers.h"
 
 /**
- * @brief Runs the COMMAND_CREATE_OR_VIEW command, which creates a new parking
- * lot or lists existing ones.
+ * @brief Creates a new parking lot or lists existing ones.
  *
- * @param args An array of void pointers to the arguments of the command.
- * @return SUCCESSFUL if the command is executed successfully,
- * UNEXPECTED if an error occurs.
+ * @param buff Input buffer with park details.
+ * @param parks Park index.
+ * @return error_codes: SUCCESSFUL if park added, UNEXPECTED_INPUT if error.
  */
 error_codes run_p(char *buff, park_index *parks) {
 	p_args args = {.err = {}};
@@ -60,6 +59,14 @@ error_codes run_p(char *buff, park_index *parks) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Enters vehicle into park.
+ *
+ * @param buff Input buffer with vehicle details.
+ * @param system System details structure.
+ * @return error_codes: SUCCESSFUL if entrance registered, UNEXPECTED_INPUT if
+ * error.
+ */
 error_codes run_e(char *buff, sys *system) {
 	e_args args = {.err = {}};
 
@@ -90,6 +97,12 @@ error_codes run_e(char *buff, sys *system) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Checks for errors in vehicle entry.
+ *
+ * @param args Arguments for the 'e' command.
+ * @param system System details structure.
+ */
 void run_e_errochecking(e_args *args, sys *system) {
 	registry *last_vehicle_reg;
 
@@ -121,6 +134,14 @@ void run_e_errochecking(e_args *args, sys *system) {
 	verify_date_registry(&(system->sysdate), args->err, &(args->timestamp));
 }
 
+/**
+ * @brief Registers vehicle exit from park.
+ *
+ * @param buff Input buffer with vehicle & park details.
+ * @param system System details structure.
+ * @return error_codes: SUCCESSFUL if exit registered, UNEXPECTED_INPUT if
+ * error.
+ */
 error_codes run_s(char *buff, sys *system) {
 	s_args args = {.err = {}};
 
@@ -154,6 +175,13 @@ error_codes run_s(char *buff, sys *system) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Parses arguments for vehicle exit.
+ *
+ * @param buff Input buffer with vehicle & park details.
+ * @param args Arguments for the 's' command.
+ * @param parks Park index.
+ */
 void run_s_args(char **buff, s_args *args, park_index *parks) {
 	int name_size;
 	name_size = str_size(buff);
@@ -165,6 +193,12 @@ void run_s_args(char **buff, s_args *args, park_index *parks) {
 	args->park = find_park(args->name, hash(args->name), parks);
 }
 
+/**
+ * @brief Checks for errors in vehicle exit.
+ *
+ * @param args Arguments for the 's' command.
+ * @param sysdate System date.
+ */
 void run_s_errochecking(s_args *args, date *sysdate) {
 	registry *last_vehicle_reg;
 
@@ -194,6 +228,14 @@ void run_s_errochecking(s_args *args, date *sysdate) {
 	}
 }
 
+/**
+ * @brief Shows all registries for a vehicle.
+ *
+ * @param buff Input buffer with vehicle details.
+ * @param vehicles Vehicle index.
+ * @return error_codes: SUCCESSFUL on registries listed, UNEXPECTED_INPUT if
+ * error.
+ */
 error_codes run_v(char *buff, vehicle_index *vehicles) {
 	v_args args = {
 		.err = {}, .non_null_regs = malloc(sizeof(registry *) * CHUNK_SIZE)};
@@ -218,6 +260,11 @@ error_codes run_v(char *buff, vehicle_index *vehicles) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Checks for errors in listing vehicle registries.
+ *
+ * @param args Arguments for the 'v' command.
+ */
 void run_v_errorchecking(v_args *args) {
 	if (!is_licence_plate(args->license_plate)) {
 		sprintf(
@@ -240,6 +287,14 @@ void run_v_errorchecking(v_args *args) {
 	}
 }
 
+/**
+ * @brief Shows billing for a park generally or on specific day.
+ *
+ * @param buff Input buffer with park details.
+ * @param system System details structure.
+ * @return error_codes: SUCCESSFUL on billing listed, UNEXPECTED_INPUT if
+ * error.
+ */
 error_codes run_f(char *buff, sys *system) {
 	f_args args = {.err = {}, .timestamp = {.minutes = 0, .hours = 0}};
 
@@ -280,6 +335,13 @@ error_codes run_f(char *buff, sys *system) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Removes a park and lists remaining parks.
+ *
+ * @param buff Input buffer with park details.
+ * @param parks Park index.
+ * @return error_codes: SUCCESSFUL on park removed, UNEXPECTED_INPUT if error.
+ */
 error_codes run_r(char *buff, park_index *parks) {
 	r_args args = {.names = malloc(sizeof(char *) * CHUNK_SIZE)};
 
@@ -309,6 +371,13 @@ error_codes run_r(char *buff, park_index *parks) {
 	return SUCCESSFUL;
 }
 
+/**
+ * @brief Verifies if a date of a registry is valid and not in the past.
+ *
+ * @param sysdate System date.
+ * @param err Error message.
+ * @param timestamp Date to verify.
+ */
 void verify_date_registry(date *sysdate, char *err, date *timestamp) {
 	if (!is_valid_date(timestamp) ||
 		sysdate->total_mins > timestamp->total_mins) {

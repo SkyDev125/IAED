@@ -1,9 +1,9 @@
 /**
  * @file commands.h
  * @author Diogo Santos (ist1110262)
- * @brief This file contains the declarations for command functions.
- * @version 0.1
- * @date 10-03-2024
+ * @brief Declarations for command functions.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *
@@ -14,43 +14,47 @@
 
 #include "headers.h"
 
-/// @defgroup command_functions Command related function declarations
+/// @defgroup command_functions Command execution related functions.
 /// @{
 
-/// Function to run the COMMAND_CREATE_OR_VIEW command, which creates a new
-/// parking lot or lists existing ones
+/// Creates a new parking lot or lists existing ones.
 error_codes run_p(char *buff, park_index *parks);
 
-/// Function to run the COMMAND_ADD_VEHICLE command, which registers the entry
-/// of a vehicle
+/// Registers an entrance of a vehicle in a parking lot.
 error_codes run_e(char *buff, sys *system);
 
-void run_e_errochecking(e_args *buff, sys *system);
-
-/// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
-/// exit of a vehicle
+/// Registers an exit of a vehicle in a parking lot.
 error_codes run_s(char *buff, sys *system);
 
+/// Aux function to collect the args needed for exit.
 void run_s_args(char **buff, s_args *args, park_index *parks);
 
-void run_s_errochecking(s_args *args, date *sysdate);
-
-/// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
-/// information
+/// Lists all the registries of a vehicle.
 error_codes run_v(char *buff, vehicle_index *vehicles);
 
-void run_v_errorchecking(v_args *args);
-
-/// Function to run the COMMAND_PARK_BILLING command, which shows the billing
-/// of a parking lot
+/// List all the registries of a parking lot.
 error_codes run_f(char *buff, sys *system);
 
-/// Function to run the COMMAND_REMOVE_PARK command, which removes a parking
-/// lot from the system
+/// Deletes a parking lot.
 error_codes run_r(char *buff, park_index *parks);
 
 /// @}
 
+/// @defgroup Error_checking Error checking related functions.
+/// @{
+
+/// Error checking for entrances.
+void run_e_errochecking(e_args *buff, sys *system);
+
+/// Error checking for exits.
+void run_s_errochecking(s_args *args, date *sysdate);
+
+/// Error checking for vehicle registries listing .
+void run_v_errorchecking(v_args *args);
+
+/// Aux date checking for registry validation.
 void verify_date_registry(date *sysdate, char *err, date *timestamp);
+
+/// @}
 
 #endif
