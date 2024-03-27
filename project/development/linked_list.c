@@ -240,21 +240,22 @@ void register_entrance(e_args *args, vehicle_index *vehicles) {
 	(args->park->free_spaces)--;
 }
 
-void register_exit(
-	park *parking, date *timestamp, vehicle *reg_vehicle, float *cost
-) {
+void register_exit(s_args *args) {
 	registry_union *entry = malloc(sizeof(registry_union));
 
-	entry->exit.park_ptr = parking;
-	entry->exit.vehicle_ptr = reg_vehicle;
-	entry->exit.timestamp = *timestamp;
-	entry->exit.cost = *cost;
+	entry->exit.park_ptr = args->park;
+	entry->exit.vehicle_ptr = args->vehicle;
+	entry->exit.timestamp = args->end;
+	entry->exit.cost = args->cost;
 
 	add_entry(
-		&(reg_vehicle->registries), &(reg_vehicle->last_reg), entry, EXIT
+		&(args->vehicle->registries), &(args->vehicle->last_reg),
+		entry, EXIT
 	);
-	add_entry(&(parking->registries), &(parking->last_reg), entry, EXIT);
-	(parking->free_spaces)++;
+	add_entry(
+		&(args->park->registries), &(args->park->last_reg), entry, EXIT
+	);
+	(args->park->free_spaces)++;
 }
 
 void add_entry(

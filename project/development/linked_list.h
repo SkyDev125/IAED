@@ -60,9 +60,7 @@ vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles);
 
 void register_entrance(e_args *args, vehicle_index *vehicles);
 
-void register_exit(
-	park *park_enter, date *timestamp, vehicle *reg_vehicle, float *cost
-);
+void register_exit(s_args *args);
 
 void add_entry(
 	registry **reg, registry **last_reg, registry_union *entry,

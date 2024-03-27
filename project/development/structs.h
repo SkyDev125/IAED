@@ -115,9 +115,9 @@ typedef struct {
 
 typedef struct {
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF];
-	date timestamp, start_timestamp;
-	park *parking;
-	vehicle *temp_vehicle;
+	date start, end;
+	park *park;
+	vehicle *vehicle;
 	float cost;
 } s_args;
 
