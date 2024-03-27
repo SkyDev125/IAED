@@ -13,7 +13,7 @@
 #include "headers.h"
 
 /**
- * @brief Function to generate a hash value for a string.
+ * @brief Main hashing function - djb2.
  *
  * @param str The string to be hashed.
  * @return The hash value of the string.
@@ -28,43 +28,58 @@ unsigned long hash(char *str) {
 	return hash;
 }
 
+/**
+ * @brief Computes hash value for a vehicle's license plate.
+ *
+ * @param license_plate Vehicle's license plate.
+ * @param hash_size Size of the hash table.
+ * @return Hash value.
+ */
 unsigned long vehicle_hash(char *license_plate, int hash_size) {
 	return hash(license_plate) % hash_size;
 }
 
+/**
+ * @brief Resizes the vehicle index hash table.
+ *
+ * @param vehicles Vehicle index.
+ * @param new_size New size for the hash table.
+ */
 void resize_vehicle_index(vehicle_index *vehicles, int new_size) {
 	vehicle **new_buckets = calloc(new_size, sizeof(vehicle *)),
 			*current_vehicle, *next_vehicle;
 	unsigned long new_hash;
+
+	// Iterate over the old hash table and rehash all vehicles.
 	for (int i = 0; i < vehicles->size; i++) {
 		current_vehicle = vehicles->buckets[i];
 		while (current_vehicle != NULL) {
 			next_vehicle = current_vehicle->next;
 			new_hash = vehicle_hash(current_vehicle->license_plate, new_size);
+
 			// Add the vehicle to the front of the list in the new bucket
 			current_vehicle->next = new_buckets[new_hash];
 			new_buckets[new_hash] = current_vehicle;
 			current_vehicle = next_vehicle;
 		}
 	}
+
+	// Free the old hash table and update the vehicle index.
 	free(vehicles->buckets);
 	vehicles->buckets = new_buckets;
 	vehicles->size = new_size;
 }
 
 /**
- * @brief Function to add a new park to the linked list.
+ * @brief Adds a new park to the park index.
  *
- * @param name The name of the park.
- * @param capacity The capacity of the park.
- * @param first_hour_value The cost for the first hour of parking.
- * @param value The cost for subsequent hours of parking.
- * @param day_value The cost for a full day of parking.
+ * @param args Arguments for the 'p' command.
+ * @param parks Park index.
  */
 void add_park(p_args *args, park_index *parks) {
-	// Allocate memory for new park and initialize its fields
 	park *new_park = malloc(sizeof(park));
 
+	// Initialize the new park values.
 	new_park->name = args->name;
 	new_park->hashed_name = hash(args->name);
 	new_park->capacity = args->capacity;
@@ -90,6 +105,12 @@ void add_park(p_args *args, park_index *parks) {
 	parks->park_num++;
 }
 
+/**
+ * @brief Removes a park from the park index.
+ *
+ * @param parking Park to remove.
+ * @param parks Park index.
+ */
 void remove_park(park *parking, park_index *parks) {
 	// If the park is NULL, there's nothing to remove
 	if (parking == NULL) return;
@@ -125,7 +146,9 @@ void remove_park(park *parking, park_index *parks) {
 }
 
 /**
- * @brief Function to print all parks in the linked list.
+ * @brief Lists all parks in the park index.
+ *
+ * @param parks Park index.
  */
 void show_parks(park_index *parks) {
 	int i;
@@ -139,6 +162,14 @@ void show_parks(park_index *parks) {
 	}
 }
 
+/**
+ * @brief Finds a park in the park index.
+ *
+ * @param name Name of the park.
+ * @param name_hash Hashed name of the park.
+ * @param parks Park index.
+ * @return Pointer to the park if found, NULL otherwise.
+ */
 park *find_park(char *name, unsigned long name_hash, park_index *parks) {
 	int i;
 	park *current = parks->first;
@@ -152,22 +183,24 @@ park *find_park(char *name, unsigned long name_hash, park_index *parks) {
 	return NULL;
 }
 
+/**
+ * @brief Adds a new vehicle to the vehicle index.
+ *
+ * @param license_plate License plate of the vehicle.
+ * @param vehicles Vehicle index.
+ * @return Pointer to the new vehicle.
+ */
 vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
-	// Allocate memory for new park and initialize its fields
 	vehicle *new_vehicle = malloc(sizeof(vehicle));
 	unsigned long hash;
 	float load_factor;
 
 	// Calculate the load factor
 	load_factor = (float)vehicles->vehicle_num / vehicles->size;
-
-	// If the load factor is greater than a certain threshold (e.g., 0.75),
-	// resize the hashmap
 	if (load_factor > 0.75) {
 		resize_vehicle_index(vehicles, vehicles->size * 2);
 	}
 
-	// Compute the hash of the vehicle's license plate
 	hash = vehicle_hash(license_plate, vehicles->size);
 
 	memcpy(new_vehicle->license_plate, license_plate, LICENSE_PLATE_SIZE + 1);
@@ -183,28 +216,13 @@ vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles) {
 	return new_vehicle;
 }
 
-void remove_all_vehicles(vehicle_index *vehicles) {
-	for (int i = 0; i < vehicles->size; i++) {
-		vehicle *current_vehicle = vehicles->buckets[i], *next_vehicle;
-		while (current_vehicle != NULL) {
-			next_vehicle = current_vehicle->next;
-
-			// If the vehicle has registries, clean them
-			if (current_vehicle->registries != NULL) {
-				clean_vehicle_registries(current_vehicle->registries);
-			}
-
-			// Free the memory for the vehicle's registry and the vehicle
-			// itself
-			free(current_vehicle);
-			vehicles->vehicle_num--;
-
-			current_vehicle = next_vehicle;
-		}
-		vehicles->buckets[i] = NULL;
-	}
-}
-
+/**
+ * @brief Finds a vehicle in the vehicle index.
+ *
+ * @param license_plate License plate of the vehicle.
+ * @param vehicles Vehicle index.
+ * @return Pointer to the vehicle if found, NULL otherwise.
+ */
 vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles) {
 	unsigned long license_plate_hash =
 		vehicle_hash(license_plate, vehicles->size);
@@ -219,6 +237,13 @@ vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles) {
 
 	return NULL;
 }
+
+/**
+ * @brief Registers the entrance of a vehicle to a park.
+ *
+ * @param args Arguments for the 'e' command.
+ * @param vehicles Vehicle index.
+ */
 void register_entrance(e_args *args, vehicle_index *vehicles) {
 	registry_union *entry = malloc(sizeof(registry_union));
 
@@ -240,6 +265,11 @@ void register_entrance(e_args *args, vehicle_index *vehicles) {
 	(args->park->free_spaces)--;
 }
 
+/**
+ * @brief Registers the exit of a vehicle from a park.
+ *
+ * @param args Arguments for the 's' command.
+ */
 void register_exit(s_args *args) {
 	registry_union *entry = malloc(sizeof(registry_union));
 
@@ -249,15 +279,20 @@ void register_exit(s_args *args) {
 	entry->exit.cost = args->cost;
 
 	add_entry(
-		&(args->vehicle->registries), &(args->vehicle->last_reg),
-		entry, EXIT
+		&(args->vehicle->registries), &(args->vehicle->last_reg), entry, EXIT
 	);
-	add_entry(
-		&(args->park->registries), &(args->park->last_reg), entry, EXIT
-	);
+	add_entry(&(args->park->registries), &(args->park->last_reg), entry, EXIT);
 	(args->park->free_spaces)++;
 }
 
+/**
+ * @brief Adds a new entry to a registry.
+ *
+ * @param reg Pointer to the registry.
+ * @param last_reg Pointer to the last registry.
+ * @param entry Entry to add.
+ * @param type Type of the registry (ENTER or EXIT).
+ */
 void add_entry(
 	registry **reg, registry **last_reg, registry_union *entry,
 	registry_types type
@@ -279,45 +314,13 @@ void add_entry(
 	}
 }
 
-void clean_park_registries(registry *reg) {
-	registry *temp_reg;
-
-	if ((*reg).type == ENTER) {
-		(*reg).registration->enter.park_ptr = NULL;
-	} else {
-		(*reg).registration->exit.park_ptr = NULL;
-	}
-
-	while ((*reg).next != NULL) {
-		temp_reg = (*reg).next->next;
-
-		if ((*reg).next->type == ENTER) {
-			(*reg).next->registration->enter.park_ptr = NULL;
-		} else {
-			(*reg).next->registration->exit.park_ptr = NULL;
-		}
-
-		free((*reg).next);
-		(*reg).next = temp_reg;
-	}
-	free(reg);
-}
-
-void clean_vehicle_registries(registry *reg) {
-	registry *next_reg = (*reg).next;
-	registry *temp_reg;
-
-	free((*reg).registration);
-
-	while (next_reg != NULL) {
-		temp_reg = next_reg->next;
-		free(next_reg->registration);
-		free(next_reg);
-		next_reg = temp_reg;
-	}
-	free(reg);
-}
-
+/**
+ * @brief Prints all registries in the given array.
+ *
+ * @param regs Array of registries.
+ * @param last_reg Last registry in the array.
+ * @param size Size of the array.
+ */
 void show_all_regs(registry **regs, registry *last_reg, int *size) {
 	date *timestamp;
 	int i;
@@ -326,6 +329,7 @@ void show_all_regs(registry **regs, registry *last_reg, int *size) {
 		for (i = 0; i < *size; i++) {
 			print_registry(regs[i]);
 		}
+		// Extra checking is needed for the last print with \n.
 	} else {
 		for (i = 0; i < *size; i++) {
 			if (regs[i] == last_reg) {
@@ -342,10 +346,14 @@ void show_all_regs(registry **regs, registry *last_reg, int *size) {
 	}
 }
 
+/**
+ * @brief Prints a single registry.
+ *
+ * @param reg Registry to print.
+ */
 void print_registry(registry *reg) {
 	date *timestamp;
 
-	// parque1 01-01-2024 08:00 01-01-2024 08:10
 	if (reg->type == ENTER) {
 		timestamp = &(reg->registration->enter.timestamp);
 		printf(
@@ -363,14 +371,23 @@ void print_registry(registry *reg) {
 	}
 }
 
+/**
+ * @brief Counts and returns non-null registries from a linked list.
+ *
+ * @param first_reg First registry in the linked list.
+ * @param destination Pointer to the destination array.
+ * @return Count of non-null registries.
+ */
 int get_non_null_registries(registry *first_reg, registry ***destination) {
 	int count = 0;
 	registry *current = first_reg;
 	while (current != NULL) {
-		if ((current->type == ENTER &&
-			 current->registration->enter.park_ptr != NULL) ||
+		if ((current->type == ENTER && // clang-format off
+				current->registration->enter.park_ptr != NULL) ||
 			(current->type == EXIT &&
-			 current->registration->exit.park_ptr != NULL)) {
+				current->registration->exit.park_ptr != NULL)) {
+			// clang-format on
+
 			// Resize array in chunks
 			if (count % CHUNK_SIZE == 0) {
 				*destination = realloc(
@@ -385,8 +402,15 @@ int get_non_null_registries(registry *first_reg, registry ***destination) {
 	return count;
 }
 
-registry *find_reg(registry *reg, registry_types type) {
-	registry *current_reg = reg;
+/**
+ * @brief Finds a registry of a specific type in a linked list of registries.
+ *
+ * @param reg First registry in the linked list.
+ * @param type Type of the registry to find.
+ * @return Pointer to the found registry, or NULL if not found.
+ */
+registry *find_reg(registry *first_reg, registry_types type) {
+	registry *current_reg = first_reg;
 	while (current_reg != NULL) {
 		if (current_reg->type == type) {
 			return current_reg;
@@ -396,11 +420,17 @@ registry *find_reg(registry *reg, registry_types type) {
 	return NULL;
 }
 
+/**
+ * @brief Prints the total cost of all exits from a park for each day.
+ *
+ * @param parking Pointer to the park.
+ */
 void show_billing(park *parking) {
 	registry *current_reg;
 	date *old_date, *current_date;
 	float total_cost = 0;
 
+	// Find the first exit registry
 	current_reg = find_reg(parking->registries, EXIT);
 	if (current_reg == NULL) return;
 	old_date = &(current_reg->registration->exit.timestamp);
@@ -408,6 +438,7 @@ void show_billing(park *parking) {
 	while (current_reg != NULL) {
 		if (current_reg->type == EXIT) {
 			current_date = &(current_reg->registration->exit.timestamp);
+
 			if (is_same_day(old_date, current_date)) {
 				total_cost += current_reg->registration->exit.cost;
 			} else {
@@ -419,6 +450,7 @@ void show_billing(park *parking) {
 				old_date = current_date;
 			}
 		}
+
 		current_reg = current_reg->next;
 	}
 
@@ -428,11 +460,18 @@ void show_billing(park *parking) {
 	);
 }
 
+/**
+ * @brief Prints the cost of all exits from a park for a specific day.
+ *
+ * @param parking Pointer to the park.
+ * @param day Date of the day to show billing for.
+ */
 void show_billing_day(park *parking, date *day) {
 	registry *current_reg = parking->registries;
 	registry_exit *current_exit;
 	date *temp_date;
 
+	// Find the first exit registry of the day
 	while (current_reg != NULL) {
 		if (current_reg->type == EXIT) {
 			temp_date = &(current_reg->registration->enter.timestamp);
@@ -457,13 +496,22 @@ void show_billing_day(park *parking, date *day) {
 				break;
 			}
 		}
+
 		current_reg = current_reg->next;
 	}
 }
 
+/**
+ * @brief Get the names of all parks in a park index.
+ *
+ * @param parks Pointer to the park index.
+ * @param park_names Pointer to the destination array for the park names.
+ * @return Count of parks.
+ */
 int get_park_names(park_index *parks, char ***park_names) {
 	park *current = parks->first;
 	int count = 0;
+
 	while (current != NULL) {
 		if (count % 10 == CHUNK_SIZE) {
 			*park_names =

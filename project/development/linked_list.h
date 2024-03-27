@@ -14,58 +14,88 @@
 
 #include "headers.h"
 
-/// @defgroup park_operations Parking Lot Operations
+/// @defgroup park_functions Parking Lot related functions.
 /// @{
 
-/// Adds a new parking lot to the list.
+/// Add new park to parks list.
 void add_park(p_args *args, park_index *parks);
 
-/// Removes a parking lot from the list.
+/// Remove park from parks list.
 void remove_park(park *parking, park_index *parks);
 
-/// Returns the total number of parking lots in the list.
+/// List all parks.
 void show_parks(park_index *parks);
 
-park *find_park(char *name, unsigned long park_hash, park_index *parks);
+/// List the billing of a park for a specific day.
+void show_billing_day(park *parking, date *day);
+
+/// List the billing of a park generally.
+void show_billing(park *parking);
+
+/// Get all park names and store them in a vector.
+int get_park_names(park_index *parks, char ***park_names);
 
 /// @}
 
-/// Hashes a string.
-unsigned long hash(char *str);
-
-unsigned long vehicle_hash(char *license_plate, int hash_size);
-
-void resize_vehicle_index(vehicle_index *index, int new_size);
-
-void print_registry(registry *reg);
-int get_non_null_registries(registry *first_reg, registry ***destination);
-void show_all_regs(registry **regs, registry *last_reg, int *size);
-void show_billing_day(park *parking, date *day);
-void show_billing(park *parking);
-registry *find_reg(registry *reg, registry_types type);
-int get_park_names(park_index *parks, char ***park_names);
-
-/// @defgroup vehicle_operations Vehicle operations
+/// @defgroup vehicle_functions Vehicle related functions.
 /// @{
 
+/// Add a new vehicle to vehicles hashtable.
 vehicle *add_vehicle(char *license_plate, vehicle_index *vehicles);
 
-void remove_all_vehicles(vehicle_index *vehicles);
-
-void clean_park_registries(registry *reg);
-
-void clean_vehicle_registries(registry *reg);
-
-vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles);
-
+/// Register a new entrace of a vehicle in a park.
 void register_entrance(e_args *args, vehicle_index *vehicles);
 
+/// Register a new exit of a vehicle in a park.
 void register_exit(s_args *args);
 
+/// @}
+
+/// @defgroup registry_functions Registry related functions.
+/// @{
+
+/// List registry.
+void print_registry(registry *reg);
+
+/// Get all registries and store them in a vector.
+int get_non_null_registries(registry *first_reg, registry ***destination);
+
+/// List all registries.
+void show_all_regs(registry **regs, registry *last_reg, int *size);
+
+/// Add the entry to the registry list of a park or vehicle.
 void add_entry(
 	registry **reg, registry **last_reg, registry_union *entry,
 	registry_types type
 );
+
+/// @}
+
+/// @defgroup search_functions Search related functions.
+/// @{
+
+/// Find a park by name.
+park *find_park(char *name, unsigned long park_hash, park_index *parks);
+
+/// Find a vehicle by its license_plate.
+vehicle *find_vehicle(char *license_plate, vehicle_index *vehicles);
+
+/// Find a registry by type.
+registry *find_reg(registry *reg, registry_types type);
+
+/// @}
+
+/// @defgroup hash_functions Hash & hashtable related functions.
+/// @{
+
+/// Main hashing function - djb2.
+unsigned long hash(char *str);
+
+/// Computes hash for vehicles based on license plate.
+unsigned long vehicle_hash(char *license_plate, int hash_size);
+
+/// Resize vehicle hashtable.
+void resize_vehicle_index(vehicle_index *index, int new_size);
 
 /// @}
 

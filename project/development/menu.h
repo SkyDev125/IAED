@@ -12,10 +12,15 @@
 #ifndef MENU
 #define MENU
 
+/// @defgroup menu_functions Menu & command related functions.
+/// @{
+
 /// Displays the main menu and handles user input.
 error_codes menu();
 
 /// Executes the command specified by the user.
 error_codes run_command(sys *system);
+
+/// @}
 
 #endif

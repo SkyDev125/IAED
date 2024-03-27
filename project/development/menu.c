@@ -12,7 +12,7 @@
 #include "headers.h"
 
 /**
- * @brief Main loop function for the menu
+ * @brief Main loop function for the menu.
  *
  * @return SUCCESSFUL if the menu executes successfully,
  * UNEXPECTED if an unexpected error occurs, and UNEXPECTED_INPUT if the
@@ -24,7 +24,7 @@ error_codes menu() {
 		.vehicles = {calloc(HASH_SIZE, sizeof(vehicle *)), HASH_SIZE, 0},
 		.sysdate = {0, 0, 0, 0, 0, 0}};
 
-	// Main menu loop
+	// Main menu loop.
 	while (TRUE) {
 		if (fgets(system.buff, MAX_LINE_BUFF + 1, stdin) == NULL) {
 			free_all(&system.parks, &system.vehicles);
@@ -42,16 +42,14 @@ error_codes menu() {
 /**
  * @brief Executes the command specified by the 'command' parameter
  *
- * @param command A character representing a valid command specified in
- * VALID_COMMANDS[] in parsing.c.
- * @param args An array of pointers that contains the arguments for the
- * command.
+ * @param system A pointer to the system structure containing the command and
+ * other system data.
  * @return SUCCESSFUL if the command executes successfully,
  * UNEXPECTED_INPUT if an unexpected command is received, and SUCCESSFUL_EXIT
  * if the 'q' command is received.
  */
 error_codes run_command(sys *system) {
-	// Point to args
+	// Point to args.
 	char *args = system->command;
 	args = remove_whitespaces(++args);
 

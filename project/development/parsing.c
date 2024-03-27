@@ -11,9 +11,17 @@
 
 #include "headers.h"
 
-const int days_in_month[] = {JAN, FEB, MAR, APR, MAY, JUN,
-							 JUL, AUG, SEP, OCT, NOV, DEC};
+// Array with total days in a month.
+const int days_in_month[] = { // clang-format off.
+	JAN, FEB, MAR, APR, MAY, JUN,
+	JUL, AUG, SEP, OCT, NOV, DEC}; // clang-format on
 
+/**
+ * @brief Removes leading whitespaces from a string.
+ *
+ * @param str Input string.
+ * @return Pointer to the first non-whitespace character in the string.
+ */
 char *remove_whitespaces(char *str) {
 	char *current = str;
 	while ((int)*current != '\0') {
@@ -24,6 +32,14 @@ char *remove_whitespaces(char *str) {
 	return current;
 }
 
+/**
+ * @brief Finds the first occurrence of a delimiter in a string.
+ *
+ * @param str Input string.
+ * @param delimiter Character to find.
+ * @return Pointer to the delimiter in the string, or to the last character if
+ * the delimiter is not found.
+ */
 char *delimit(char *str, char delimiter) {
 	char *current = str;
 	while ((int)*current != '\0') {
@@ -32,10 +48,17 @@ char *delimit(char *str, char delimiter) {
 	}
 
 	if ((int)*current == '\0') current--;
-
 	return current;
 }
 
+/**
+ * @brief Parses a string from a larger string.
+ *
+ * @param str_start Start of the string to parse.
+ * @param str_end End of the string to parse.
+ * @param size Size of the string to parse.
+ * @return Pointer to the parsed string.
+ */
 char *parse_string(char *str_start, char **str_end, int *size) {
 	char *str = malloc(sizeof(char) * (*size + 1));
 
@@ -46,6 +69,14 @@ char *parse_string(char *str_start, char **str_end, int *size) {
 	return str;
 }
 
+/**
+ * @brief Parses a license plate from a string.
+ *
+ * @param str Input string.
+ * @param license_plate Output string for the license plate.
+ * @return Pointer to the character after the license plate in the input
+ * string.
+ */
 char *parse_license_plate(char *str, char *license_plate) {
 	str = remove_whitespaces(str);
 	strncpy(license_plate, str, LICENSE_PLATE_SIZE);
@@ -54,6 +85,13 @@ char *parse_license_plate(char *str, char *license_plate) {
 	return str + LICENSE_PLATE_SIZE;
 }
 
+/**
+ * @brief Parses a date from a string.
+ *
+ * @param str Input string.
+ * @param timestamp Output date structure.
+ * @return Pointer to the character after the date in the input string.
+ */
 char *parse_date(char *str, date *timestamp) {
 	str = remove_whitespaces(str);
 	sscanf(
@@ -64,6 +102,13 @@ char *parse_date(char *str, date *timestamp) {
 	return str + DATE_READ_SIZE;
 }
 
+/**
+ * @brief Parses a time from a string.
+ *
+ * @param str Input string.
+ * @param timestamp Output date structure.
+ * @return Pointer to the character after the time in the input string.
+ */
 char *parse_time(char *str, date *timestamp) {
 	str = remove_whitespaces(str);
 	sscanf(str, "%2d:%2d", &(timestamp->hours), &(timestamp->minutes));
@@ -71,6 +116,12 @@ char *parse_time(char *str, date *timestamp) {
 	return str + HOUR_READ_SIZE;
 }
 
+/**
+ * @brief Calculates the size of a string.
+ *
+ * @param args Pointer to the string.
+ * @return Size of the string.
+ */
 int str_size(char **args) {
 	char *end_args;
 	if ((*args)[0] != '"')
@@ -81,12 +132,17 @@ int str_size(char **args) {
 	return end_args - *args;
 }
 
+/**
+ * @brief Checks if a string is a valid license plate.
+ *
+ * @param str Input string.
+ * @return TRUE if the string is a valid license plate, FALSE otherwise.
+ */
 bool is_licence_plate(char *str) {
 	bool number_pair = FALSE, letter_pair = FALSE;
 	char *original_str = str;
 
 	while (str < original_str + LICENSE_PLATE_SIZE) {
-
 		if (isalpha(*str) && isalpha(*(str + 1))) {
 			letter_pair = TRUE;
 		} else if (isdigit(*str) && isdigit(*(str + 1))) {
@@ -95,13 +151,18 @@ bool is_licence_plate(char *str) {
 			return FALSE;
 
 		if (*(str + 2) != '-') break;
-
 		str += 3;
 	}
 
 	return number_pair && letter_pair;
 }
 
+/**
+ * @brief Converts a date to minutes.
+ *
+ * @param d Pointer to the date structure.
+ * @return The date converted to minutes.
+ */
 long int date_to_minutes(date *d) {
 	long int minutes;
 
@@ -118,6 +179,12 @@ long int date_to_minutes(date *d) {
 	return minutes;
 }
 
+/**
+ * @brief Checks if a date is valid.
+ *
+ * @param d Pointer to the date structure.
+ * @return TRUE if the date is valid, FALSE otherwise.
+ */
 bool is_valid_date(date *d) {
 	if (d->months < 1 || d->months > 12) return FALSE;
 	if (d->days > days_in_month[d->months - 1] || d->days < 1) return FALSE;
@@ -127,6 +194,14 @@ bool is_valid_date(date *d) {
 	return TRUE;
 }
 
+/**
+ * @brief Calculates the cost of parking.
+ *
+ * @param start Pointer to the start date structure.
+ * @param end Pointer to the end date structure.
+ * @param parking Pointer to the park structure.
+ * @return The cost of parking.
+ */
 float calculate_cost(date *start, date *end, park *parking) {
 	int minutes_to_pay = (end->total_mins - start->total_mins), i;
 	float cost, day_cost = 0;
@@ -166,9 +241,16 @@ float calculate_cost(date *start, date *end, park *parking) {
 	return cost;
 }
 
+/**
+ * @brief Checks if two dates are the same day.
+ *
+ * @param d1 Pointer to the first date structure.
+ * @param d2 Pointer to the second date structure.
+ * @return TRUE if the dates are the same day, FALSE otherwise.
+ */
 bool is_same_day(date *d1, date *d2) {
-	if ((d1->days == d2->days) && (d1->months == d2->months) &&
-		(d1->years == d2->years))
-		return TRUE;
-	return FALSE;
+	return (
+		(d1->days == d2->days) && (d1->months == d2->months) &&
+		(d1->years == d2->years)
+	);
 }

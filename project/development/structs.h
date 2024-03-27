@@ -24,15 +24,17 @@ typedef struct {
 	int years, months, days, hours, minutes;
 } date;
 
-/// @defgroup registry_types Registration of entries and exit types.
+/// @defgroup registry_structs Structures related to registries.
 /// @{
 
+/// Representation of an ENTRY
 typedef struct {
 	vehicle *vehicle_ptr;
 	park *park_ptr;
 	date timestamp;
 } registry_enter;
 
+/// Representation of an EXIT
 typedef struct {
 	vehicle *vehicle_ptr;
 	park *park_ptr;
@@ -40,11 +42,13 @@ typedef struct {
 	float cost;
 } registry_exit;
 
+/// Union of registries
 typedef union {
 	registry_enter enter;
 	registry_exit exit;
 } registry_union;
 
+/// Structure to represent a registry.
 typedef struct registration {
 	registry_union *registration;
 	registry_types type;
@@ -53,7 +57,7 @@ typedef struct registration {
 
 /// @}
 
-/// @defgroup park_vehicle_types Parks and Vehicle types
+/// @defgroup park_vehicle_structs Parks and Vehicle related structures.
 /// @{
 
 /// Structure to represent a parking lot.
@@ -92,19 +96,17 @@ typedef struct {
 
 /// @}
 
-typedef struct {
-	char buff[MAX_LINE_BUFF + 1], *command;
-	park_index parks;
-	vehicle_index vehicles;
-	date sysdate;
-} sys;
+/// @defgroup command_execution_structs Structures of command arguments.
+/// @{
 
+/// Structure to represent the arguments of 'p' command.
 typedef struct {
 	char *name, err[MAX_LINE_BUFF];
 	int name_size, capacity;
 	float first_value, value, day_value;
 } p_args;
 
+/// Structure to represent the arguments of 'e' command.
 typedef struct {
 	int name_size;
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF];
@@ -113,6 +115,7 @@ typedef struct {
 	vehicle *vehicle;
 } e_args;
 
+/// Structure to represent the arguments of 's' command.
 typedef struct {
 	char *name, license_plate[LICENSE_PLATE_SIZE + 1], err[MAX_LINE_BUFF];
 	date start, end;
@@ -121,6 +124,7 @@ typedef struct {
 	float cost;
 } s_args;
 
+/// Structure to represent the arguments of 'v' command.
 typedef struct {
 	char err[MAX_LINE_BUFF], license_plate[LICENSE_PLATE_SIZE + 1];
 	vehicle *vehicle;
@@ -128,6 +132,7 @@ typedef struct {
 	int count;
 } v_args;
 
+/// Structure to represent the arguments of 'f' command.
 typedef struct {
 	char *name, err[MAX_LINE_BUFF];
 	date timestamp;
@@ -135,10 +140,21 @@ typedef struct {
 	int name_size;
 } f_args;
 
+/// Structure to represent the arguments of 'r' command.
 typedef struct {
 	int name_size, count, i;
 	char *name, **names;
 	park *park;
 } r_args;
+
+/// @}
+
+/// Structure to represent the system vars.
+typedef struct {
+	char buff[MAX_LINE_BUFF + 1], *command;
+	park_index parks;
+	vehicle_index vehicles;
+	date sysdate;
+} sys;
 
 #endif

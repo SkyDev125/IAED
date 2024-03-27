@@ -14,11 +14,20 @@
 
 #include "headers.h"
 
-/// @defgroup mem_management Memory Management Functions
+/// @defgroup mem_management Memory Management Functions.
 /// @{
 
 /// Frees all allocated memory.
 void free_all(park_index *parks, vehicle_index *vehicles);
+
+/// Clean the registries from a specific park.
+void clean_park_registries(registry *reg);
+
+/// Clean the registries from a specific vehicle.
+void clean_vehicle_registries(registry *reg);
+
+/// Remove all vehicles from hashtable.
+void remove_all_vehicles(vehicle_index *vehicles);
 
 /// @}
 

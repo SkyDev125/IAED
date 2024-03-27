@@ -1,9 +1,9 @@
 /**
  * @file constants.h
  * @author Diogo Santos (ist1110262)
- * @brief This file contains all the constants used throughout the program.
- * @version 0.1
- * @date 09-03-2024
+ * @brief Constants used throughout the program.
+ * @version 1
+ * @date 27-03-2024
  *
  * @copyright Copyright (c) 2024
  *
@@ -12,24 +12,24 @@
 #ifndef CONSTANTS
 #define CONSTANTS
 
-/// @defgroup buffer_constants Buffer related constants
+/// @defgroup buffer_constants Buffer related constants.
 /// @{
 
-/// Buffer size for reading input from the command line
+/// Buffer size for reading input from the command line.
 #define MAX_LINE_BUFF 8192
 
-/// Chunk size to allocate memory in most situations
+/// Chunk size to allocate memory in most situations.
 #define CHUNK_SIZE 100
 
-/// Hash-map default size
+/// Hash-map default size.
 #define HASH_SIZE 100
 
 /// @}
 
-/// @defgroup command_constants Command related constants
+/// @defgroup command_constants Command related constants.
 /// @{
 
-/// Valid commands
+/// Valid commands.
 enum commands {
 	COMMAND_EXIT = 'q',
 	CREATE_OR_VIEW = 'p',
@@ -42,41 +42,41 @@ enum commands {
 
 /// @}
 
-/// @defgroup park_vehicle_constants Park & Vehicle related constants
+/// @defgroup park_vehicle_constants Park & Vehicle related constants.
 /// @{
 
-/// Maximum number of parks
+/// Maximum number of parks.
 #define MAX_PARKS 20
 
-/// Maximum size of License plates
+/// Maximum size of License plates.
 #define LICENSE_PLATE_SIZE 8
 
-/// Maximum size of date
+/// Maximum size of date.
 #define DATE_READ_SIZE 10
 
-/// Maximum size of hour
+/// Maximum size of hour.
 #define HOUR_READ_SIZE 5
 
-/// Step in minutes for counting the cost
+/// Step in minutes for counting the cost.
 #define PARK_PAY_STEP 15
 
-/// Blocks of time that will be counted at a different price
+/// Blocks of time that will be counted at a different price.
 #define TOTAL_INITIAL_BLOCKS 4
 
 /// @}
 
-/// @defgroup Registry related constants
+/// @defgroup Registry related constants.
 /// @{
 
-/// Valid Registry types
+/// Valid Registry types.
 typedef enum registry_types_e { ENTER, EXIT, UNDEFINED } registry_types;
 
 /// @}
 
-/// @defgroup date_constants Date related constants
+/// @defgroup date_constants Date related constants.
 /// @{
 
-/// Days per month
+/// Days per month.
 enum months {
 	JAN = 31,
 	FEB = 28,
@@ -92,17 +92,18 @@ enum months {
 	DEC = 31,
 };
 
-/// Total days in a year
+/// Total days in a year.
 #define DAYS_IN_YEAR 365
 
-/// Total minutes in a day
+/// Total minutes in a day.
 #define MINS_PER_DAY 24 * 60
 
 /// @}
 
-/// @defgroup exit_codes Exit code constants
+/// @defgroup error_codes Error codes constants.
 /// @{
 
+/// error codes.
 typedef enum error_codes_e {
 	SUCCESSFUL = 0,
 	SUCCESSFUL_EXIT = 1,
@@ -112,16 +113,16 @@ typedef enum error_codes_e {
 
 /// @}
 
-/// @defgroup boolean constants
+/// @defgroup boolean constants.
 /// @{
 
-/// True value for comparisons
+/// True value for comparisons.
 #define TRUE 1
 
-/// False value for comparisons
+/// False value for comparisons.
 #define FALSE 0
 
-/// Alias for boolean
+/// Alias for boolean.
 typedef char bool;
 
 /// @}

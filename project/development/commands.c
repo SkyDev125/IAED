@@ -21,13 +21,13 @@
 error_codes run_p(char *buff, park_index *parks) {
 	p_args args = {.err = {}};
 
-	// No arguments found
+	// No arguments found.
 	if (*buff == '\0') {
 		show_parks(parks);
 		return SUCCESSFUL;
 	}
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	args.name_size = str_size(&buff);
 	args.name = parse_string(buff, &buff, &(args.name_size));
 	args.capacity = strtol(buff, &buff, 0);
@@ -35,15 +35,15 @@ error_codes run_p(char *buff, park_index *parks) {
 	args.value = strtof(buff, &buff);
 	args.day_value = strtof(buff, &buff);
 
-	// Error checking
+	// Error checking.
 	if (find_park(args.name, hash(args.name), parks) != NULL) {
 		sprintf(args.err, "%s: parking already exists.\n", args.name);
 	} else if (args.capacity <= 0) {
 		sprintf(args.err, "%i: invalid capacity.\n", args.capacity);
-	} else if (args.first_value <= 0 // clang-format off
+	} else if (args.first_value <= 0 // clang-format off.
 				|| args.first_value > args.value 
 				|| args.value > args.day_value) {
-		sprintf(args.err, "invalid cost.\n"); // clang-format on
+		sprintf(args.err, "invalid cost.\n"); // clang-format on.
 	} else if (parks->park_num == MAX_PARKS) {
 		sprintf(args.err, "too many parks.\n");
 	}
@@ -53,7 +53,7 @@ error_codes run_p(char *buff, park_index *parks) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	add_park(&args, parks);
 
 	return SUCCESSFUL;
@@ -70,7 +70,7 @@ error_codes run_p(char *buff, park_index *parks) {
 error_codes run_e(char *buff, sys *system) {
 	e_args args = {.err = {}};
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	args.name_size = str_size(&buff);
 	args.name = parse_string(buff, &buff, &args.name_size);
 	buff = parse_license_plate(buff, args.license_plate);
@@ -80,7 +80,7 @@ error_codes run_e(char *buff, sys *system) {
 	args.park = find_park(args.name, hash(args.name), &(system->parks));
 	args.vehicle = find_vehicle(args.license_plate, &(system->vehicles));
 
-	// Error checking
+	// Error checking.
 	run_e_errochecking(&args, system);
 	if (args.err[0] != '\0') {
 		printf("%s", args.err);
@@ -88,7 +88,7 @@ error_codes run_e(char *buff, sys *system) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	system->sysdate = args.timestamp;
 	register_entrance(&args, &(system->vehicles));
 	printf("%s %i\n", args.name, (args.park)->free_spaces);
@@ -145,11 +145,11 @@ void run_e_errochecking(e_args *args, sys *system) {
 error_codes run_s(char *buff, sys *system) {
 	s_args args = {.err = {}};
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	run_s_args(&buff, &args, &(system->parks));
 	args.vehicle = find_vehicle(args.license_plate, &(system->vehicles));
 
-	// Error checking
+	// Error checking.
 	run_s_errochecking(&args, &(system->sysdate));
 	if (args.err[0] != '\0') {
 		printf("%s", args.err);
@@ -157,7 +157,7 @@ error_codes run_s(char *buff, sys *system) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	args.start = args.vehicle->last_reg->registration->enter.timestamp;
 	args.cost = calculate_cost(&args.start, &args.end, args.park);
 	system->sysdate = args.end;
@@ -240,11 +240,11 @@ error_codes run_v(char *buff, vehicle_index *vehicles) {
 	v_args args = {
 		.err = {}, .non_null_regs = malloc(sizeof(registry *) * CHUNK_SIZE)};
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	parse_license_plate(buff, args.license_plate);
 	args.vehicle = find_vehicle(args.license_plate, vehicles);
 
-	// Error checking
+	// Error checking.
 	run_v_errorchecking(&args);
 	if (args.err[0] != '\0') {
 		printf("%s", args.err);
@@ -252,7 +252,7 @@ error_codes run_v(char *buff, vehicle_index *vehicles) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	merge_sort(args.non_null_regs, 0, args.count - 1);
 	show_all_regs(args.non_null_regs, args.vehicle->last_reg, &(args.count));
 
@@ -298,7 +298,7 @@ void run_v_errorchecking(v_args *args) {
 error_codes run_f(char *buff, sys *system) {
 	f_args args = {.err = {}, .timestamp = {.minutes = 0, .hours = 0}};
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	args.name_size = str_size(&buff);
 	args.name = parse_string(buff, &buff, &(args.name_size));
 	args.park = find_park(args.name, hash(args.name), &(system->parks));
@@ -310,7 +310,7 @@ error_codes run_f(char *buff, sys *system) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// No more arguments found
+	// No more arguments found.
 	if (*buff == '\0') {
 		show_billing(args.park);
 		free(args.name);
@@ -320,7 +320,7 @@ error_codes run_f(char *buff, sys *system) {
 	buff = parse_date(buff, &args.timestamp);
 	args.timestamp.total_mins = date_to_minutes(&args.timestamp);
 
-	// Error checking
+	// Error checking.
 	if (!is_valid_date(&(args.timestamp)) ||
 		args.timestamp.total_mins > system->sysdate.total_mins) {
 		printf("invalid date.\n");
@@ -328,7 +328,7 @@ error_codes run_f(char *buff, sys *system) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	show_billing_day(args.park, &args.timestamp);
 
 	free(args.name);
@@ -345,12 +345,12 @@ error_codes run_f(char *buff, sys *system) {
 error_codes run_r(char *buff, park_index *parks) {
 	r_args args = {.names = malloc(sizeof(char *) * CHUNK_SIZE)};
 
-	// Get the necessary arguments
+	// Get the necessary arguments.
 	args.name_size = str_size(&buff);
 	args.name = parse_string(buff, &buff, &args.name_size);
 	args.park = find_park(args.name, hash(args.name), parks);
 
-	// Error checking
+	// Error checking.
 	if (args.park == NULL) {
 		printf("%s: no such parking.\n", args.name);
 		free(args.name);
@@ -358,7 +358,7 @@ error_codes run_r(char *buff, park_index *parks) {
 		return UNEXPECTED_INPUT;
 	}
 
-	// Execute the command
+	// Execute the command.
 	remove_park(args.park, parks);
 	args.count = get_park_names(parks, &args.names);
 	merge_sort_names(args.names, 0, args.count - 1);
