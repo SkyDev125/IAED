@@ -25,22 +25,15 @@ error_codes run_p(char *buff, park_index *parks);
 /// of a vehicle
 error_codes run_e(char *buff, sys *system);
 
-void run_e_errochecking(e_args *args, sys *system);
+void run_e_errochecking(e_args *buff, sys *system);
 
 /// Function to run the COMMAND_REMOVE_VEHICLE command, which registers the
 /// exit of a vehicle
-error_codes
-run_s(char *args, park_index *parks, vehicle_index *vehicles, date *sysdate);
+error_codes run_s(char *buff, sys *system);
 
-void run_s_args(
-	char **args, char **name, char *license_plate, date *timestamp,
-	park **parking, park_index *parks
-);
+void run_s_args(char **buff, s_args *args, park_index *parks);
 
-void run_s_errochecking(
-	park *parking, char *name, char *err, char *license_plate, date *timestamp,
-	vehicle *temp_vehicle, date *sysdate
-);
+void run_s_errochecking(s_args *args, date *sysdate);
 
 /// Function to run the COMMAND_VIEW_VEHICLE command, which shows the vehicle
 /// information

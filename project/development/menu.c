@@ -63,9 +63,7 @@ error_codes run_command(sys *system) {
 	case ADD_VEHICLE:
 		return run_e(args, system);
 	case REMOVE_VEHICLE:
-		return run_s(
-			args, &(system->parks), &(system->vehicles), &(system->sysdate)
-		);
+		return run_s(args, system);
 	case VIEW_VEHICLE:
 		return run_v(args, &(system->vehicles));
 	case PARK_BILLING:
