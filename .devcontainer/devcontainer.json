@@ -35,21 +35,12 @@
 				"streetsidesoftware.code-spell-checker-portuguese",
 				"chrmarti.regex",
 				"LouisWT.regexp-preview",
-				"Gruntfuggly.todo-tree"
+				"Gruntfuggly.todo-tree",
+				"george-alisson.html-preview-vscode",
+				"cschlosser.doxdocgen"
 			]
 		}
 	},
 	"workspaceFolder": "/workspaces/IAED",
-	"postCreateCommand": {
-		"update_apt": "sudo apt-get update"
-	},
-	"postStartCommand": {
-		"install_clang_formatter": "apt-get install -y clang-format",
-		"install_gdb": "apt-get install -y gdb",
-		"install_valgrind": "apt-get install -y valgrind",
-		"install_pip": "apt-get install -y  pip",
-		"install_lizard": "pip install lizard",
-		"install_jinja2": "pip install jinja2",
-		"install_cpp_check": "apt-get install -y cppcheck"
-	}
+	"postCreateCommand": "sudo ./install.sh"
 }
